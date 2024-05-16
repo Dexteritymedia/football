@@ -1,0 +1,35 @@
+{% load wagtailimages_tags wagtailcore_tags %}
+
+{% if entries %}	
+	<div class="container-fluid pt-5 mb-3">
+        <div class="container">
+		
+					<div class="section-title mb-3">
+                            <h4 class="m-0 text-uppercase font-weight-bold">Related posts</h4>
+                        </div>
+			
+            <div class="owl-carousel news-carousel carousel-item-4 position-relative">
+			
+			{% for entry in entries %}
+			<a class="h6 m-0 text-white text-uppercase font-weight-semi-bold" href="{{ entry.url }}" style="text-decoration: none;">
+                <div class="position-relative overflow-hidden" style="height: 300px;">
+				{% image entry.image original as banner %}
+				
+                    <img class="img-fluid h-100" src="{{ banner.url }}" alt="{{ banner.alt }}" style="object-fit: cover;">
+                    <div class="overlay">
+                        <div class="mb-2">
+                            <button class="badge badge-primary text-uppercase" >{{ entry.get_parent.specific.title|title }}</button>
+                            <small>{{ entry.first_published_at }}</small>
+                        </div>
+                        {{ entry.title }}
+			
+                    </div>
+                </div>
+			</a>
+			{% endfor %}
+				
+            </div>
+			
+        </div>
+    </div>
+{% endif %}

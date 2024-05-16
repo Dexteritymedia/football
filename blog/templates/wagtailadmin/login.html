@@ -1,0 +1,10 @@
+{% extends "wagtailadmin/login.html" %}
+
+{% load static %}
+
+{% block branding_login %}
+{% if settings.site_settings.AdminSiteSettings.admin_site_name %}
+<h1>Sign in to {{ settings.site_settings.AdminSiteSettings.admin_site_name }}</h1>
+<!--wagtailadmin login title-->
+{% endif %}
+{% endblock %}

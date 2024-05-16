@@ -1,0 +1,33 @@
+{% load menu_tags %}
+
+{% if menu_items %}
+            <div class="collapse navbar-collapse justify-content-between px-0 px-lg-3" id="navbarCollapse">
+                <div class="navbar-nav mr-auto py-0">
+				{% for item in menu_items %}
+					{% if item.sub_menu %}
+                    <div class="nav-item dropdown">
+                        <a href="{{ item.href }}" class="nav-link dropdown-toggle {{ item.active_class }}" data-toggle="dropdown">{{ item.text|title }}</a>
+						{% for sub_item in item.sub_menu.items %}
+                        <div class="dropdown-menu rounded-0 m-0">
+                            <a href="{{ sub_item.href }}" class="dropdown-item {{ item.active_class }}">{{ sub_item.text|title }}</a>
+                        </div>
+						{% endfor %}
+                    </div>
+					{% else %}
+                    <a href="{{ item.href }}" class="nav-item nav-link {{ item.active_class }}">{{ item.text|title }}</a>
+					{% endif %}
+				{% endfor %}
+                </div>
+                <div class="input-group ml-auto d-none d-lg-flex" style="width: 100%; max-width: 300px;">
+				<form method="GET" action="{% url 'sports-search' %}">
+				{% csrf_token %}
+                    <input type="text" class="form-control border-0" placeholder="Search">
+                    <div class="input-group-append">
+                        <button class="input-group-text bg-primary text-dark border-0 px-3"><i
+                                class="fa fa-search"></i></button>
+                    </div>
+				</form>
+                </div>
+            </div>
+	
+{% endif %}

@@ -1,0 +1,13 @@
+
+
+<div class="col-lg-3 col-md-6 mb-5">
+    <h5 class="mb-4 text-white text-uppercase font-weight-bold">{{ menu_heading|title }}</h5>
+        <div class="row">
+				{% for item in menu_items %}
+				<div class="">
+					<p class="font-weight-medium"><a class="btn btn-link" href="{{ item.href }}">{{ item.text|truncatewords:3 }}</a></p>
+				 </div>
+				 {% endfor %}
+           
+        </div>
+</div>

@@ -1,0 +1,129 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en" data-bs-theme="dark">
+
+<head>
+    <meta charset="utf-8">
+	
+    <title>{% block title %}{% endblock title %}- </title>
+	
+    <meta content="width=device-width, initial-scale=1.0" name="viewport">
+    <meta content="" name="keywords">
+    <meta content="" name="description">
+
+    <!-- Favicon -->
+    <link href="img/favicon.ico" rel="icon">
+
+    <!-- Google Web Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    
+	<link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@500&display=swap" rel="stylesheet">
+
+    <!-- Icon Font Stylesheet -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.10.0/css/all.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.4.1/font/bootstrap-icons.css" rel="stylesheet">
+
+    <!-- Libraries Stylesheet -->
+
+    <!-- Customized Bootstrap Stylesheet -->
+    <link href="{% static 'css/bootstrap.min.css' %}" rel="stylesheet">
+
+    <!-- Template Stylesheet -->
+    <link href="{% static 'css/style.css' %}" rel="stylesheet">
+	<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+	<style>
+		body, h1, .h1, h2, .h2, h3, .h3, h4, .h4, h5, .h5, h6, .h6  {
+			font-family: "Quicksand" !important;
+		}
+		
+		.gradient-color {
+			background: -webkit-linear-gradient(right, red , yellow);
+			-webkit-background-clip: text;
+			-webkit-text-fill-color: transparent;
+		}
+		
+		.btn-outline-primary {
+			background: -webkit-linear-gradient(right, red , yellow) !important;
+			background-color: -webkit-linear-gradient(right, red , yellow) !important;
+			border-color: none !important;
+			color: white !important;
+		}
+		.btn-primary:hover,
+		.btn-primary:active,
+		.btn-primary:visited,
+		.btn-primary:focus {
+			background-color: DarkBlue !important;
+			border-color: DarkBlue !important;
+		}
+		{% block css %}
+		{% endblock css %}
+	</style>
+</head>
+
+<body>
+	<nav class="navbar navbar-expand-lg bg-body-tertiary fixed-top">
+  <div class="container">
+    <a class="navbar-brand gradient-color " href="/"><b>Offcanvas navbar</b></a>
+    <button class="navbar-toggler" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasNavbar" aria-controls="offcanvasNavbar" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="offcanvas offcanvas-end" tabindex="-1" id="offcanvasNavbar" aria-labelledby="offcanvasNavbarLabel">
+      <div class="offcanvas-header">
+        <h5 class="offcanvas-title" id="offcanvasNavbarLabel">Offcanvas</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+      </div>
+      <div class="offcanvas-body">
+        <ul class="navbar-nav justify-content-end flex-grow-1 pe-3">
+          <li class="nav-item">
+            <a class="nav-link active" aria-current="page" href="/">Home</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="{% url 'match-search' %}">Search</a>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</nav>
+
+<nav class="navbar bg-body-tertiary bg-light fixed-bottom">
+  <div class="container">
+            <a class="nav-link active" aria-current="page" href="/"><i class="fa fa-home  fa-2x" aria-hidden="true"></i><p><small>Home</small></p></a>
+            <a class="nav-link active" aria-current="page" href="/"><i class="fa fa-home  fa-2x" aria-hidden="true"></i><p><small>Home</small></p></a>
+            <a class="nav-link active" aria-current="page" href="/blog"><i class="fa fa-home fa-2x" aria-hidden="true"></i><p><small>Blog</small></p></a>
+            <a class="nav-link" href="{% url 'match-search' %}"><i class="fa fa-search  fa-2x" aria-hidden="true"></i><p><small>Search</small></p></a>
+  </div>
+</nav>
+
+	<div class="container-fluid">
+		<div class="row mt-5">
+		
+			{% block content %}
+			{% endblock content %}
+		</div>
+	</div>
+	
+	<footer>
+		<div class="container">
+            <div class="row">
+                <div class="col-12 text-center mb-3">
+                    &copy; <a class="border-bottom mb-4" href="/"></a>, <p>{% now 'Y' %} All Right Reserved.</p> 
+                </div>
+			</div>
+		</div>
+	</footer>
+
+
+	<script src="https://unpkg.com/htmx.org@1.9.6" integrity="sha384-FhXw7b6AlE/jyjlZH5iHa/tTe9EpJ1Y55RjcgPbjeWMskSxZt1v9qkxLJWNJaGni" crossorigin="anonymous"></script>
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0/dist/js/bootstrap.bundle.min.js"></script>
+	<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js" integrity="sha384-I7E8VVD/ismYTF4hNIPjVp/Zjvgyol6VFvRkX/vR+Vc4jQkC+hVqc2pM8ODewa9r" crossorigin="anonymous"></script>
+	<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.min.js" integrity="sha384-0pUGZvbkm6XF6gxjEnlmuGrJXVbNuzT9qBBavbLwCsOGabYfZo0T0to5eqruptLy" crossorigin="anonymous"></script>
+
+	{% block js %}
+	{% endblock js %}
+</body>
+
+</html>

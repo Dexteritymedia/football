@@ -1,0 +1,23 @@
+<script
+  async
+  src="//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"
+></script>
+<ins
+  class="adsbygoogle"
+  style="display: block"
+  data-ad-client="ca-pub-xxxxxxxxxxx"
+  data-ad-slot="xxxxxxxxxxx"
+  data-ad-format="auto"
+></ins>
+<script>
+  (adsbygoogle = window.adsbygoogle || []).push({});
+</script>
+
+
+{% extends 'base.html' %}
+{% load adsense_tags %}
+
+{% block content %}
+  {% blog.title %}
+  {% blog.body|adsense_after_paragraph:1 %}
+{% endblock content %}

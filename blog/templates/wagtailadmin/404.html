@@ -1,0 +1,30 @@
+{% extends "wagtailadmin/admin_base.html" %}
+{% load wagtailadmin_tags wagtailcore_tags wagtailimages_tags i18n %}
+{% block titletag %}{% trans "Error 404: Page not found" %}{% endblock %}
+
+{% block furniture %}
+    <main class="page404__bg">
+        <div class="w-w-full w-h-full w-max-w-6xl w-mx-auto w-flex w-items-center w-justify-center">
+            {% block branding_logo %}
+                <div class="page404__logo w-hidden sm:w-block">
+					{% if settings.site_settings.AdminSiteSettings.admin_site_logo %}
+						{% image settings.site_settings.AdminSiteSettings.admin_site_logo max-30x30 as icon_image %}
+						<img src="{{ icon_image.url }}" alt=""/>
+					{% endif %}
+                </div>
+            {% endblock %}
+
+            <div class="page404__text-container">
+                <h1 class="page404__header">
+                    {% trans "Error 404" %}
+                </h1>
+
+                <p class="page404__text">
+                    {% trans "The requested page could not be found." %}
+                </p>
+
+                <a class="page404__button button" href="{% url 'wagtailadmin_home' %}">{% trans "Go to the admin" %}</a>
+            </div>
+        </div>
+    </main>
+{% endblock %}

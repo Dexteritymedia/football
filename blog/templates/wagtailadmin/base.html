@@ -1,0 +1,11 @@
+{% extends "wagtailadmin/base.html" %}
+{% load wagtailimages_tags wagtailcore_tags %}
+{% load static %}
+
+{% block branding_logo %}
+{% if settings.site_settings.AdminSiteSettings.admin_site_logo %}
+{% image settings.site_settings.AdminSiteSettings.admin_site_logo max-150x150 as logo_image %}
+<img src="{{ logo_image.url }}" alt="Dashboard"/>
+{% endif %}
+<!--wagtailadmin main picture-->
+{% endblock %}

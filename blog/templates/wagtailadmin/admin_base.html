@@ -1,0 +1,19 @@
+{% extends "wagtailadmin/admin_base.html" %}
+{% load wagtailimages_tags wagtailcore_tags %}
+{% load static %}
+
+
+{% block branding_title %}
+
+{% if settings.site_settings.AdminSiteSettings.admin_site_name %}
+{{ settings.site_settings.AdminSiteSettings.admin_site_name }}
+{% endif %}
+
+{% endblock %}
+{% block branding_favicon %}
+{% if settings.site_settings.AdminSiteSettings.admin_site_logo %}
+{% image settings.site_settings.AdminSiteSettings.admin_site_logo max-30x30 as icon_image %}
+<link rel="shortcut icon" href="{{ icon_image.url }}" />
+{% endif %}
+<!--wagtailadmin favicon image-->
+{% endblock %}
