@@ -26,7 +26,7 @@
 							{% image post.specific.image original as post_image %}
 							<a href="{{ post.url }}" style="text-decoration: none;">
                                 <img class="img-fluid w-100" src="{{ post_image.url }}" alt="{{ post.title }}" style="object-fit: cover;">
-                                <div class="bg-white border border-top-0 p-4">
+                                <div class="p-4">
                                     <div class="mb-2">
                                        <small class="text-body">{{ post.first_published_at }}</small>
                                     </div>
@@ -34,7 +34,7 @@
 							</a>
 									{% for block in post.body %}
 										{% if block.block_type == 'paragraph' %}
-											bbbb<div class="mb-4 pb-2">{{block.value.paragraph|richtext|safe|truncatewords:30}}</div>
+											<div class="mb-4 pb-2">{{block.value.paragraph|richtext|safe|truncatewords:30}}</div>
 										{% endif %}
 									{% endfor %}
                                 </div>

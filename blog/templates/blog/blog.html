@@ -4,6 +4,7 @@
 {% block content %}
 
 
+{% comment %}
 <!-- Main News Slider Start -->
     <div class="container-fluid">
         <div class="row">
@@ -60,10 +61,9 @@
         </div>
     </div>
     <!-- Main News Slider End -->
+{% endcomment %}
 
-{% include 'blog/include/topics.html' %}
 
-{% include 'blog/include/posts.html' %}
 
 <!-- News With Sidebar Start -->
     <div class="container-fluid">
@@ -71,43 +71,28 @@
             <div class="row">
                 <div class="col-lg-12">
                     <div class="row">
-                        
+						
+						
 					{% for post in posts %}
-						{% if post.id == 14 or post.id == 20 %}
                         <div class="col-lg-12">
                             <div class="row news-lg mx-0 mb-3">
-                                <div class="col-md-6 h-100 px-0">
+                                <div class="col-6 h-100 px-0">
 								{% image post.image original as banner %}
                                     <img class="img-fluid h-100" src="{{ banner.url }}" style="object-fit: cover;">
                                 </div>
-                                <div class="col-md-6 d-flex flex-column border bg-white h-100 px-0">
+                                <div class="col-6 d-flex h-100 px-0">
                                     <div class=" p-4">
                                         <div class="mb-2">
                                             <a class="badge badge-primary text-uppercase font-weight-semi-bold p-2 mr-2"
-                                                href="">{{ post.get_parent.specific.title|title }}</a>
-                                            <a class="text-body" href=""><small>{{ post.first_published_at }}</small></a>
+                                                href="{{ post.url }}">{{ post.get_parent.specific.title|title }}</a>
+                                            <a class="text-body" href="{{ post.url }}"><small>{{ post.first_published_at|date }}</small></a>
                                         </div>
-                                        <a class="h4 d-block mb-3 text-secondary text-uppercase font-weight-bold" href="">{{ post.title }}</a>
+                                        <a class="h4 d-block mb-3 text-secondary text-uppercase font-weight-bold" href="{{ post.url }}">{{ post.title }}</a>
                                     </div>
                                 </div>
                             </div>
                         </div>
-						{% else %}
-						<div class="col-lg-6">
-                            <div class="position-relative mb-3">
-							{% image post.image original as banner %}
-                                <img class="img-fluid w-100" src="{{ banner.url }}" style="object-fit: cover;">
-                                <div class="bg-white border border-top-0 p-4">
-                                    <div class="mb-2">
-                                        <a class="badge badge-primary text-uppercase font-weight-semi-bold p-2 mr-2"
-                                            href="">{{ post.id }}</a>
-                                        <a class="text-body" href=""><small>{{ post.first_published_at }}</small></a>
-                                    </div>
-                                    <a class="h4 d-block mb-3 text-secondary text-uppercase font-weight-bold" href="{{ post.url }}">{{ post.title }}</a>
-                                </div>
-                            </div>
-                        </div>
-						{% endif %}
+						
                     {% endfor %}
                     </div>
                 </div>

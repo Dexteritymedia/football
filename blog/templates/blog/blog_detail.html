@@ -1,5 +1,5 @@
 {% extends 'base.html' %}
-{% load static wagtailcore_tags wagtailimages_tags %}
+{% load static wagtailcore_tags wagtailimages_tags ads_tags %}
 
 
 
@@ -32,9 +32,9 @@
                     <div class="position-relative mb-3">
 					{% image page.image original as post_image %}
                         <img class="img-fluid w-100" src="{{ post_image.url }}" style="object-fit: cover;">
-                        <div class="bg-white border border-top-0 p-4">
+                        <div class=" p-4">
                             <div class="mb-3">
-								{% if page.get_parent.specific.title == 'Home' %}
+								{% if page.get_parent.specific.title == 'Sports' %}
 								{% else %}
                                 <a class="badge badge-primary text-uppercase font-weight-semi-bold p-2 mr-2"
                                     href="{{ page.get_parent.url }}">{{ page.get_parent.specific.title|title }}</a>
@@ -43,6 +43,7 @@
                             </div>
                             <h1 class="mb-3 text-secondary text-uppercase font-weight-bold">{{ page.title }}</h1>
 							<div>{{ page.body }}</div>
+							
 							{% with tags=page.tags.all %}
     {% if tags %}
 			<div class="mb-3">
