@@ -1,4 +1,4 @@
-{% extends 'base.html' %}
+{% extends 'blog/base.html' %}
 {% load static wagtailcore_tags wagtailimages_tags ads_tags %}
 
 
@@ -9,7 +9,9 @@
 	{% else %}
 	<meta content="{{ page.body.value.paragraph|richtext|truncatewords:10 }}" name="description">
 	{% endif %}
-	{% endblock meta_description %}
+{% endblock meta_description %}
+
+
 {% block content %}
 
 
@@ -27,11 +29,11 @@
     <div class="container-fluid">
             <div class="row">
 			
-                <div class="col-lg-8">
+                <div class="p-4 col-lg-8">
                     <!-- News Detail Start -->
                     <div class="position-relative mb-3">
 					{% image page.image original as post_image %}
-                        <img class="img-fluid w-100" src="{{ post_image.url }}" style="object-fit: cover;">
+                        <img class="img-fluid" src="{{ post_image.url }}" style="object-fit: cover;">
                         <div class=" p-4">
                             <div class="mb-3">
 								{% if page.get_parent.specific.title == 'Sports' %}
@@ -39,9 +41,9 @@
                                 <a class="badge badge-primary text-uppercase font-weight-semi-bold p-2 mr-2"
                                     href="{{ page.get_parent.url }}">{{ page.get_parent.specific.title|title }}</a>
 								{% endif %}
-                                {{ page.first_published_at|date:'N. dS, Y' }}
+                                <p>Published: {{ page.first_published_at|date:'N. dS, Y' }}</p>
                             </div>
-                            <h1 class="mb-3 text-secondary text-uppercase font-weight-bold">{{ page.title }}</h1>
+                            <h1 class="mb-3 font-weight-bold">{{ page.title }}</h1>
 							<div>{{ page.body }}</div>
 							
 							{% with tags=page.tags.all %}
@@ -74,14 +76,13 @@
 	{% comment %}
 	{% include 'blog/include/more_posts.html' %}
 	
-	{% extends 'base.html' %}
 {% load adsense_tags %}
 
-{% block content %}
+
   {% blog.title %}
   {% blog.body|inject_adsense_after_paragraph:1 %}
   
-{% endblock content %}
+
 
 	{% endcomment %}
 

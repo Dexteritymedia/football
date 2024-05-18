@@ -1,5 +1,5 @@
 from wagtail import hooks
-from wagtail.contrib.modeladmin.options import ModelAdmin, ModelAdminGroup, modeladmin_register
+from wagtail_modeladmin.options import ModelAdmin, ModelAdminGroup, modeladmin_register
 
 from .models import BlogIndexPage, BlogDetailPage, BlogListingPage, BlogTagPage
 
@@ -46,7 +46,7 @@ def change_page_name(request, menu_items):
 
 class HomePageAdmin(ModelAdmin):
     model = BlogIndexPage
-    menu_label = 'Homepage'
+    menu_label = 'Blog'
     menu_icon = 'home'
     menu_order = 150
     add_to_settings_menu = False
@@ -54,7 +54,7 @@ class HomePageAdmin(ModelAdmin):
 
 class BlogListingPageAdmin(ModelAdmin):
     model = BlogListingPage
-    menu_label = 'Blog'
+    menu_label = 'Category'
     menu_icon = 'plus-inverse'
     menu_order = 160
     add_to_settings_menu = False

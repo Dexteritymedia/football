@@ -7,8 +7,6 @@ import datetime
 from django.core.management.base import BaseCommand
 from django.conf import settings
 
-import pandas as pd
-
 from project.models import PlayerStat, GoalStat, AssitStat, OtherStat
 from app.models import ClubPoint, Team, Tournament, Season
 

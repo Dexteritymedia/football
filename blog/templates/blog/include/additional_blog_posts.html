@@ -7,11 +7,11 @@
         <div class="col-lg-8 mt-5">
 		<h1 class="mb-3 text-secondary text-uppercase font-weight-bold">{{ previous_post.title }}</h1>
 		{% image previous_post.image original as post_image %}
-<img class="img-fluid w-100" src="{{ post_image.url }}" style="object-fit: cover;">
+<img class="img-fluid" src="{{ post_image.url }}" style="object-fit: cover;">
 <div class="mb-3">
-{% if previous_post.get_parent.specific.title == 'Home' %}
+{% if previous_post.get_parent.specific.title == 'Sports' %}
 {% else %}
-<a class="mt-3 badge badge-primary text-uppercase font-weight-semi-bold p-2 mr-2"
+<a class="mt-3 font-weight-semi-bold p-2 mr-2"
 	href="{{ previous_post.get_parent.url }}">{{ previous_post.get_parent.specific.title|title }}</a>
 {% endif %}
 Published {{ previous_post.first_published_at|timesince }} ago
@@ -40,13 +40,13 @@ Published {{ previous_post.first_published_at|timesince }} ago
                             <div class="position-relative mb-3">
 							{% image entry.image original as post_image %}
                                  <a href="{{ entry.url }}">
-									<img class="img-fluid w-100" src="{{ post_image.url }}" alt="{{ entry.title }}" style="object-fit: cover;">
+									<img class="img-fluid" src="{{ post_image.url }}" alt="{{ entry.title }}" style="object-fit: cover;">
 								</a>
 									
                                     <div class="mb-2">
-                                        <div class="mt-3 badge badge-primary text-uppercase font-weight-semi-bold p-2 mr-2">{{ entry.get_parent.specific.title|title }}</div><small>{{ entry.first_published_at|date:'M dS, Y' }}</small>
+                                        <div class="mt-3 font-weight-semi-bold p-2 mr-2">{{ entry.get_parent.specific.title|title }}</div><small>{{ entry.first_published_at|date:'M dS, Y' }}</small>
                                     </div>
-                                    <a class="h4 d-block mb-3 text-secondary text-uppercase font-weight-bold" href="{{ entry.url }}">{{ entry.title|truncatewords:15 }}</a>
+                                    <a class="h4 d-block mb-3 font-weight-bold" href="{{ entry.url }}">{{ entry.title|truncatewords:15 }}</a>
                             </div>
                         </div>
 			{% endfor %}

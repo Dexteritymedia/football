@@ -6,11 +6,12 @@
 <head>
     <meta charset="utf-8">
 	
-    <title>{% block title %}{% endblock title %}- </title>
+    <title>{% block title %}{% endblock title %}- {% block title_suffix %} {% endblock title_suffix %}</title>
 	
     <meta content="width=device-width, initial-scale=1.0" name="viewport">
     <meta content="" name="keywords">
     <meta content="" name="description">
+	{% block meta_description %}{% endblock meta_description %}
 
     <!-- Favicon -->
     <link href="img/favicon.ico" rel="icon">
@@ -63,58 +64,20 @@
 </head>
 
 <body>
-	<nav class="navbar navbar-expand-lg bg-body-tertiary fixed-top">
-  <div class="container">
-    <a class="navbar-brand gradient-color " href="/"><b>Offcanvas navbar</b></a>
-    <button class="navbar-toggler" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasNavbar" aria-controls="offcanvasNavbar" aria-label="Toggle navigation">
-      <span class="navbar-toggler-icon"></span>
-    </button>
-    <div class="offcanvas offcanvas-end" tabindex="-1" id="offcanvasNavbar" aria-labelledby="offcanvasNavbarLabel">
-      <div class="offcanvas-header">
-        <h5 class="offcanvas-title" id="offcanvasNavbarLabel">Offcanvas</h5>
-        <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
-      </div>
-      <div class="offcanvas-body">
-        <ul class="navbar-nav justify-content-end flex-grow-1 pe-3">
-          <li class="nav-item">
-            <a class="nav-link active" aria-current="page" href="/">Home</a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link" href="{% url 'match-search' %}">Search</a>
-          </li>
-        </ul>
-      </div>
-    </div>
-  </div>
-</nav>
 
-<nav class="navbar bg-body-tertiary bg-light fixed-bottom">
-  <div class="container">
-            <a class="nav-link active" aria-current="page" href="/"><i class="fa fa-home  fa-2x" aria-hidden="true"></i><p><small>Home</small></p></a>
-            <a class="nav-link active" aria-current="page" href="/"><i class="fa fa-home  fa-2x" aria-hidden="true"></i><p><small>Home</small></p></a>
-            <a class="nav-link active" aria-current="page" href="/blog"><i class="fa fa-home fa-2x" aria-hidden="true"></i><p><small>Blog</small></p></a>
-            <a class="nav-link" href="{% url 'match-search' %}"><i class="fa fa-search  fa-2x" aria-hidden="true"></i><p><small>Search</small></p></a>
-  </div>
-</nav>
-
-	<div class="container-fluid">
+<div class="container-fluid">
 		<div class="row mt-5">
+		
+			{% block navigation %}
+			{% endblock navigation %}
 		
 			{% block content %}
 			{% endblock content %}
+			
+			{% block footer %}
+			{% endblock footer %}
 		</div>
 	</div>
-	
-	<footer>
-		<div class="container">
-            <div class="row">
-                <div class="col-12 text-center mb-3">
-                    &copy; <a class="border-bottom mb-4" href="/"></a>, <p>{% now 'Y' %} All Right Reserved.</p> 
-                </div>
-			</div>
-		</div>
-	</footer>
-
 
 	<script src="https://unpkg.com/htmx.org@1.9.6" integrity="sha384-FhXw7b6AlE/jyjlZH5iHa/tTe9EpJ1Y55RjcgPbjeWMskSxZt1v9qkxLJWNJaGni" crossorigin="anonymous"></script>
 	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>

@@ -5,10 +5,19 @@ from django.utils.safestring import mark_safe
 
 # Create your models here.
 
+
+class Tournament(models.Model):
+    name = models.CharField(max_length=100)
+
+    def __str__(self):
+        return self.name.title()
+
+    
 class Team(models.Model):
     name = models.CharField(max_length=100, unique=True)
     logo = models.ImageField(upload_to='club_logos', null=True, blank=True)
     slug = models.SlugField(default=uuid.uuid4, null=True, blank=True)
+    league = models.ForeignKey(Tournament, default=None, null=True, on_delete=models.SET_NULL)
 
     def __str__(self):
         return self.name.title()
@@ -30,12 +39,6 @@ class Team(models.Model):
 
     class Meta:
         ordering = ['name']
-
-class Tournament(models.Model):
-    name = models.CharField(max_length=100)
-
-    def __str__(self):
-        return self.name.title()
 
 class Player(models.Model):
     first_name = models.CharField(max_length=500)

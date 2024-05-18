@@ -25,6 +25,9 @@ from django.views.generic.base import RedirectView
 from wagtail import urls as wagtail_urls
 from wagtail.admin import urls as wagtailadmin_urls
 from wagtail.documents import urls as wagtaildocs_urls
+#from wagtail.contrib.sitemaps.views import sitemap
+from wagtail.contrib.sitemaps import views as sitemaps_views
+from wagtail.contrib.sitemaps import Sitemap
 
 import environ
 
@@ -38,6 +41,26 @@ BLOG_ADMIN_URL = env('BLOG_ADMIN_URL')
 urlpatterns = [
     path(f'{ADMIN_URL}/', admin.site.urls),
     path('', include('app.urls')),
+    
+    #path('sitemap.xml', sitemap),
+    #re_path(r'^sitemap\.xml$', sitemaps_views.sitemap),
+    
+    re_path(r'^sitemap\.xml$', sitemaps_views.index, {
+        'sitemaps': {
+            'pages': Sitemap
+        },
+        'sitemap_url_name': 'sitemap',
+    }),
+    re_path(r'^sitemap-index\.xml$', sitemaps_views.index, {
+        'sitemaps': {'pages': Sitemap},
+        'sitemap_url_name': 'sitemap',
+    }),
+    
+    re_path(r'^sitemap-(?P<section>.+)\.xml$', sitemaps_views.sitemap, name='sitemap'),
+    #path('sitemap-pages.xml/', sitemaps_views.sitemap, name='sitemap'),
+
+
+
     path(f'{BLOG_ADMIN_URL}/', include(wagtailadmin_urls)),
     path('documents/', include(wagtaildocs_urls)),
     path('blog/', include(wagtail_urls)),

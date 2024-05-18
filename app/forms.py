@@ -96,7 +96,7 @@ class ClubPointForm(forms.Form):
 
 
 class MatchForm(forms.Form): 
-    club = forms.ModelMultipleChoiceField(queryset=Team.objects.all(), widget=forms.SelectMultiple)
+    club = forms.ModelMultipleChoiceField(queryset=Team.objects.filter(league__name='Premier League'), widget=forms.SelectMultiple)
     matchweek = forms.ChoiceField(label="Match Week", required=False, help_text='Enter a match week', widget=forms.NumberInput(attrs={'type':'range', 'class': 'gradient-color', 'step': '1', 'min': '0', 'value': '0', 'max': '38', 'id':'matchweek'}),)
     outcome = forms.ChoiceField(label="Match Outcome", required=False, initial='D', choices=OUTCOME)
     ground = forms.ChoiceField(required=False, label="Match Ground", choices=GROUND)
