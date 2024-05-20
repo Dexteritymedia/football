@@ -38,7 +38,7 @@
                             <div class="mb-3">
 								{% if page.get_parent.specific.title == 'Sports' %}
 								{% else %}
-                                <a class="badge badge-primary text-uppercase font-weight-semi-bold p-2 mr-2"
+                                <a class="text-uppercase font-weight-semi-bold p-2 mr-2"
                                     href="{{ page.get_parent.url }}">{{ page.get_parent.specific.title|title }}</a>
 								{% endif %}
                                 <p>Published: {{ page.first_published_at|date:'N. dS, Y' }}</p>

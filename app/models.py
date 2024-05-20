@@ -45,7 +45,8 @@ class Player(models.Model):
     last_name = models.CharField(max_length=500)
     other_name = models.CharField(max_length=500, blank=True)
     club = models.ForeignKey(Team, default=None, null=True, on_delete=models.SET_NULL)
-    date_of_birth = models.DateField()
+    date_of_birth = models.DateField(blank=True)
+    nationality = models.CharField(max_length=100)
 
     def __str__(self):
         return f'{self.last_name} {self.first_name} {self.other_name}'
@@ -200,6 +201,7 @@ class MatchDayScorer(models.Model):
 
     def __str__(self):
         return f'{self.team.name} {self.player.first_name} {self.score}'
+    
 
 
 

@@ -84,7 +84,7 @@
 							<div class="col-md-8">
 								<div class="card-body">
 								<a href="{{ post.url }}" style="color: white; text-decoration: none;">
-									<p class="badge badge-primary text-uppercase font-weight-semi-bold p-2 mr-2" href="{{ post.url }}">{{ post.get_parent.specific.title|title }}</p>
+									<p class="btn btn-primary text-uppercase font-weight-semi-bold p-2 mr-2" href="{{ post.url }}">{{ post.get_parent.specific.title|title }}</p>
 									<h5 class="card-title">{{ post.title }}</h5>
 									<p class="card-text">{{post.body|striptags |truncatewords:15}}</p></a>
 									<p class="card-text"><small class="text-muted">{{ post.first_published_at|date }}</small></p>
@@ -100,41 +100,27 @@
         </div>
     </div>
 	
-	<nav aria-label="Page navigation">
-    <ul class="flex pl-0 rounded list-none flex-wrap">
-
-      {% if posts.has_previous %}
-        <li>
-          <a href=""
-             class="text-blue-500 dark:text-white inline-block py-2 px-4 bg-white  border border-gray-300 border-r-0 rounded-l-lg hover:bg-blue-500 hover:text-white dark:bg-gray-700 dark:border-gray-500 dark:hover:bg-blue-500 dark:hover:text-white">
-            Previous
-          </a>
-        </li>
-      {% else %}
-        <li>
-          <a href="#" class="pointer-events-none text-gray-300 inline-block py-2 px-4 bg-white  border border-gray-300 border-r-0 rounded-l-lg hover:bg-blue-500 hover:text-white dark:bg-gray-700 dark:border-gray-500 dark:hover:bg-blue-500 dark:hover:text-white">
+	<nav aria-label="Page navigation example">
+  <ul class="pagination justify-content-center">
+	{% if posts.has_previous %}
+        <li class="page-item">
+          <a href="?page={{ posts.previous_page_number }}"
+             class="page-link">
             Previous
           </a>
         </li>
       {% endif %}
-
-      {% if posts.has_next %}
-        <li>
-          <a href=""
-             class="text-blue-500 dark:text-white inline-block py-2 px-4 bg-white  border border-gray-300 rounded-r-lg hover:bg-blue-500 hover:text-white dark:bg-gray-700 dark:border-gray-500 dark:hover:bg-blue-500 dark:hover:text-white">
-            Next
-          </a>
-        </li>
-      {% else %}
-        <li>
-          <a href="#" class="pointer-events-none text-gray-300 inline-block py-2 px-4 bg-white  border border-gray-300 rounded-r-lg hover:bg-blue-500 hover:text-white dark:bg-gray-700 dark:border-gray-500 dark:hover:bg-blue-500 dark:hover:text-white">
+	  
+	{% if posts.has_next %}
+        <li class="page-item">
+          <a href="?page={{ posts.next_page_number }}"
+             class="page-link">
             Next
           </a>
         </li>
       {% endif %}
-
-    </ul>
-  </nav>
+  </ul>
+</nav>
 
 
 {% endblock content %}

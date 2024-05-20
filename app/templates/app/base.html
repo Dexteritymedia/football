@@ -18,7 +18,10 @@
             <a class="nav-link active" aria-current="page" href="/">Home</a>
           </li>
           <li class="nav-item">
-            <a class="nav-link" href="{% url 'match-search' %}">Search</a>
+            <a class="nav-link active" href="{% url 'match-search' %}">Analyze</a>
+          </li>
+		  <li class="nav-item">
+            <a class="nav-link active" href="{% url 'payment-page' %}">Pricing</a>
           </li>
         </ul>
       </div>
@@ -29,8 +32,8 @@
 <nav class="navbar bg-body-tertiary bg-light fixed-bottom">
   <div class="container">
             <a class="nav-link active" aria-current="page" href="/"><i class="fa fa-home  fa-2x" aria-hidden="true"></i><p><small>Home</small></p></a>
-            <a class="nav-link active" aria-current="page" href="/"><i class="fa fa-sign-in fa-2x" aria-hidden="true"></i><p><small>Login</small></p></a>
-            <a class="nav-link active" aria-current="page" href="/blog"><i class="fa fa-home fa-2x" aria-hidden="true"></i><p><small>Blog</small></p></a>
+            <a class="nav-link active" aria-current="page" href="/"><i class="fa fa-user fa-2x"></i><p><small>Login</small></p></a>
+            <a class="nav-link active" aria-current="page" href="/blog"><i class="fa fa-clipboard-list fa-2x" aria-hidden="true"></i><p><small>Blog</small></p></a>
             <a class="nav-link" href="{% url 'match-search' %}"><i class="fa fa-search" style="font-size:20px" aria-hidden="true"></i><p><small>Analyze</small></p></a>
   </div>
 </nav>

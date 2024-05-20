@@ -8,4 +8,6 @@ urlpatterns = [
     path('club/<int:pk>/<str:slug>/', views.ClubDetailView.as_view(), name='club-detail'),
     path('s/', views.SearchView.as_view(), name='search-view'),
     path('match-search/', views.SearchMatchView.as_view(), name='match-search'),
+    path('pricing/', views.payment_page, name='payment-page'),
+    path('export/', views.export_csv, name='export_csv'),
 ]

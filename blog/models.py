@@ -59,7 +59,7 @@ class BlogIndexPage(Page):
             all_posts = all_posts.filter(tags__slug__in=[tags])
         
 
-        paginator = Paginator(all_posts, 18)
+        paginator = Paginator(all_posts, 25)
 
         page = request.GET.get('page')
         try:
@@ -230,7 +230,7 @@ class BlogDetailPage(Page):
 
     def get_context(self, request):
         context = super().get_context(request)
-        entries = BlogDetailPage.objects.live().public().exclude(id=self.id).order_by('-first_published_at')[:8]
+        entries = BlogDetailPage.objects.live().public().exclude(id=self.id).order_by('-first_published_at')[:4]
         #previous_post = BlogDetailPage.objects.live().public().filter(id__gt=self.id).order_by('id').only('id').first().id
         #next_post = BlogDetailPage.objects.live().public().filter(id__lt=self.id).order_by('id').only('id').first().id
         #print(previous_post)

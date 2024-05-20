@@ -1,3 +1,5 @@
+import csv
+
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth import logout, login, authenticate
 from django.contrib import messages
@@ -30,6 +32,32 @@ def search_page(request):
     #url_with_params = 
     #return HttpResponseRedirect(url_with_params)
     return render(request, 'app/search_page.html', {'form': form})
+
+
+def payment_page(request):
+    context ={}
+    return render(request, 'app/payment_page.html', context)
+
+
+def export_csv(request):
+    response = HttpResponse(content_type='text/csv')
+    response['Content-Disposition'] = 'attachment; filename="data.csv"'
+
+    writer = csv.writer(response)
+    writer.writerow(['Matchweek', 'Outcome', 'Date', 'Point', 'Total point',
+        'Goals against', 'Goals scored', 'Club against', 'Ground',
+        'Club','Season', 'Tournament'])
+
+    data = ClubPoint.objects.all().values_list(
+        'matchweek', 'outcome', 'date', 'point', 'total_point',
+        'goals_against', 'goals_scored', 'club_against__name', 'ground',
+        'club__name','season__name', 'tournament__name'
+    )
+    for obj in data:
+        writer.writerow(obj)
+
+    return response
+
 
 
 class ClubDetailView(FormMixin, DetailView):
@@ -110,6 +138,8 @@ class SearchMatchView(View):
             print(ground)
             print(opponent)
 
+
+            """
             if matchweek:
             
                 results = ClubPoint.objects.filter(
@@ -143,6 +173,8 @@ class SearchMatchView(View):
                 ).all()
                 #print(results)
             return render(request, 'app/search_result.html', {'results':results})
+
+        """
         
         """
             except:
