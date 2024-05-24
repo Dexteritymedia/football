@@ -12,6 +12,31 @@ class Tournament(models.Model):
     def __str__(self):
         return self.name.title()
 
+
+class BirthYear(models.Model):
+    year = models.IntegerField(unique=True)
+
+    class Meta:
+        ordering = ['year']
+
+    def __str__(self):
+        return self.year
+
+class PlayerNationality(models.Model):
+    country = models.CharField(max_length=100, blank=True)
+    country_code = models.CharField(max_length=20, unique=True)
+
+    class Meta:
+        verbose_name_plural = "Player's Nationalities"
+
+    def __str__(self):
+        return self.country_code
+
+class Position(models.Model):
+    position = models.CharField(max_length=10, unique=True)
+
+    def __str__(self):
+        return self.position
     
 class Team(models.Model):
     name = models.CharField(max_length=100, unique=True)
@@ -42,22 +67,34 @@ class Team(models.Model):
 
 class Player(models.Model):
     first_name = models.CharField(max_length=500)
-    last_name = models.CharField(max_length=500)
+    last_name = models.CharField(max_length=500, blank=True, null=True)
     other_name = models.CharField(max_length=500, blank=True)
-    club = models.ForeignKey(Team, default=None, null=True, on_delete=models.SET_NULL)
-    date_of_birth = models.DateField(blank=True)
-    nationality = models.CharField(max_length=100)
+    #club = models.ForeignKey(Team, default=None, null=True, on_delete=models.SET_NULL)
+    date_of_birth = models.DateField(blank=True, null=True)
+    nationality = models.ForeignKey(PlayerNationality, default=None, null=True, on_delete=models.SET_NULL)
+    year_of_birth = models.ForeignKey(BirthYear, default=None, null=True, on_delete=models.SET_NULL)
+
+    class Meta:
+        ordering = ['first_name','last_name']
 
     def __str__(self):
-        return f'{self.last_name} {self.first_name} {self.other_name}'
+        return f'{self.first_name} {self.last_name} {self.other_name}'
+
+    def player_age_month(self):
+        if self.date_of_birth:
+            age = datetime.date.today()-self.date_of_birth
+        return int((age).days/365.25)
 
     def player_age(self):
+        if self.year_of_birth:
+            today = datetime.datetime.strptime(datetime.date.today(), '%Y-%m-%d').year
+            age = today-self.year_of_birth.year
+        return int((age).days/365.25)
+            
         """
         today = datetime.date.today()
         return today.year - self.date_of_birth.year - ((today.month, today.day) < (self.date_of_birth.month, self.date_of_birth.day))
         """
-        age = datetime.date.today()-self.date_of_birth
-        return int((age).days/365.25)
 
 
 class Season(models.Model):
@@ -69,6 +106,31 @@ class Season(models.Model):
 
     def __str__(self):
         return self.name.title()
+
+
+
+class PlayerRecord(models.Model):
+    player = models.ForeignKey(Player, default=None, null=True, on_delete=models.SET_NULL)
+    season = models.ForeignKey(Season, default=None, null=True, on_delete=models.SET_NULL)
+    club = models.ForeignKey(Team, default=None, null=True, on_delete=models.SET_NULL)
+    position = models.ForeignKey(Position, default=None, null=True, on_delete=models.SET_NULL)
+    age = models.PositiveIntegerField(help_text="Player's age at this particular season")
+    match_played = models.PositiveIntegerField()
+    starts = models.PositiveIntegerField(help_text='Total number of matches started')
+    minutes_played = models.PositiveIntegerField()
+    goals = models.PositiveIntegerField()
+    assists = models.PositiveIntegerField()
+    card_yellow = models.PositiveIntegerField()
+    card_red = models.PositiveIntegerField()
+    penalty = models.PositiveIntegerField(help_text='Total number of penalties scored')
+    goals_assist = models.PositiveIntegerField(help_text='Total number of goals and assits')
+    goals_penalty = models.PositiveIntegerField(help_text='Total number of penalties and goals')
+
+    def __str__(self):
+        return f'Name: {self.player.first_name} {self.player.last_name} Season: {self.season.name} Goals: {self.goals}'
+
+    class Meta:
+        ordering = ['-goals']
 
 
 class ClubPoint(models.Model):
@@ -138,6 +200,9 @@ class ClubPoint(models.Model):
     matchweek = models.PositiveIntegerField(blank=True, null=True, choices=MATCHWEEK)
     goals_scored = models.PositiveIntegerField(blank=True, null=True)
     goals_against = models.PositiveIntegerField(blank=True, null=True)
+
+    class Meta:
+        ordering = ['-date']
 
     def __str__(self):
         if self.ground == 'Away':

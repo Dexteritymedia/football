@@ -1,4 +1,4 @@
-{% load wagtailcore_tags %}
+{% load wagtailcore_tags adsterra_tags %}
 <div class="streamfield__paragraph">
-    {{ value|richtext }}
+    {{ value|richtext|ads_after_paragraph:2|safe}}
 </div>

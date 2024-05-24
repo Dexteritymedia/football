@@ -1,4 +1,5 @@
 import csv
+import json
 
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth import logout, login, authenticate
@@ -14,6 +15,8 @@ from django.core.paginator import Paginator
 from django.views.generic import TemplateView, View, DetailView
 from django.views.generic.edit import FormMixin
 from django.urls import reverse
+from django.db.models import Q
+from django.core import serializers
 
 from .models import *
 from .forms import AllClubForm, ClubPointForm, MatchForm
@@ -24,14 +27,7 @@ User = get_user_model()
 
 def home(request):
     context = {}
-    return render(request, 'app/home.html', context)
-
-def search_page(request):
-    form = AllClubForm()
-    #url = reverse('')
-    #url_with_params = 
-    #return HttpResponseRedirect(url_with_params)
-    return render(request, 'app/search_page.html', {'form': form})
+    return render(request, 'app/index.html', context)
 
 
 def payment_page(request):
@@ -58,7 +54,117 @@ def export_csv(request):
 
     return response
 
+class SearchMatchView(View):
+    query = None
+    results = []
+    form_class = MatchForm
 
+    def get(self, request):
+        form = self.form_class(request.GET)
+        form.fields['outcome'].initial = None
+        if form.is_valid():
+            club = form.cleaned_data.get('club', None)
+            matchweek = form.cleaned_data['matchweek']
+            outcome = form.cleaned_data['outcome']
+            ground = form.cleaned_data.get('ground', None)
+            opponent = form.cleaned_data.get('opponent', None)
+            tournament = form.cleaned_data['tournament']
+            start_date = form.cleaned_data['start_date']
+            end_date = form.cleaned_data['end_date']
+
+            print(club)
+            print(matchweek)
+            print(outcome)
+            print(start_date)
+            print(end_date)
+            print(ground)
+            print(opponent)
+            print(tournament)
+
+            query = Q()
+
+            query &= Q(date__range=(start_date, end_date))
+
+            if club and club != "null":
+                query &= Q(club=club[0])
+            
+            if matchweek and matchweek != "null":
+                query &= Q(matchweek=matchweek)
+
+            if outcome and outcome != "null":
+                query &= Q(outcome=outcome)
+
+            if tournament and tournament != "null":
+                query &= Q(tournament=tournament[0])
+
+            if opponent and opponent != "null":
+                query &= Q(club_against__name=opponent[0])
+                print('Opponent', query)
+
+            if ground and ground != "null":
+                query &= Q(ground=ground)
+
+            print(query)
+
+            results = ClubPoint.objects.filter(query).all()
+            print(results)
+            print(str(results.query))
+
+            return render(request, 'app/match_result_page.html', {'results': results})
+            """
+            if request.user.is_authenticated:
+                return render(request, 'app/match_result_page.html', {'results': results})
+            else:
+                request.session['results'] = serializers.serialize('json', list(results))
+                return redirect('result-page')
+            """
+        else:
+            return render(request, 'app/match_search.html', {'form':form})
+
+        return render(request, 'app/match_search.html', {'form': form})
+
+
+def result_page(request):
+    if 'results' in request.session:
+        context = {}
+        context['results'] = request.session['results']
+        print(context['results'])
+        return render(request, 'app/match_result_page.html', context)
+    
+    return render(request, 'app/match_result_page.html')
+
+
+def update_data(request):
+    update_club = ClubPoint.objects.filter(club__name='Chelsea').update(club=Team.objects.get_or_create(name='Tottenham')[0])
+
+    update_all = ClubPoint.objects.update()
+
+    return export_csv(request)
+
+
+#####
+def searchform(request):
+    if request.method == "POST":
+        form = MatchForm(request.POST)
+        if form.is_valid():
+            club = form.cleaned_data['club']
+            matchweek = form.cleaned_data['matchweek']
+            outcome = form.cleaned_data['outcome']
+            print(outcome)
+            results = ClubPoint.objects.filter(club__name=club, matchweek=int(matchweek), outcome=outcome)
+            print(results)
+            return render(request, 'app/match_search_page.html', {'results': results})
+    else:
+        form = MatchForm()
+            
+    return render(request, 'app/match_search_page.html', {'form': form})
+
+def search_page(request):
+    form = AllClubForm()
+    #url = reverse('')
+    #url_with_params = 
+    #return HttpResponseRedirect(url_with_params)
+    return render(request, 'app/search_page.html', {'form': form})
 
 class ClubDetailView(FormMixin, DetailView):
     model = Team
@@ -110,93 +216,3 @@ class SearchView(View):
                 return HttpResponse("None")
 
         return render(request, 'app/search.html', {'form': form})
-
-
-
-class SearchMatchView(View):
-    query = None
-    results = []
-    form_class = MatchForm
-
-    def get(self, request):
-        form = self.form_class(request.GET)
-        if form.is_valid():
-            club = form.cleaned_data.get('club', None)
-            matchweek = form.cleaned_data['matchweek']
-            outcome = form.cleaned_data['outcome']
-            ground = form.cleaned_data.get('ground', None)
-            opponent = form.cleaned_data.get('opponent', None)
-            tournament = form.cleaned_data['tournament']
-            start_date = form.cleaned_data['start_date']
-            end_date = form.cleaned_data['end_date']
-
-            print(club[0])
-            print(matchweek)
-            print(outcome)
-            print(start_date)
-            print(end_date)
-            print(ground)
-            print(opponent)
-
-
-            """
-            if matchweek:
-            
-                results = ClubPoint.objects.filter(
-                    club__name=club[0], date__range=(start_date, end_date), matchweek=int(matchweek),
-                ).all()
-                #print(results)
-            elif outcome:
-                results = ClubPoint.objects.filter(
-                    club__name=club[0], outcome=outcome, date__range=(start_date, end_date),
-                ).all()
-                #print(results)
-            elif tournament:
-                results = ClubPoint.objects.filter(
-                    club__name=club[0], date__range=(start_date, end_date),
-                    tournament=tournament
-                ).all()
-                #print(results)
-            elif opponent:
-                results = ClubPoint.objects.filter(
-                    club__name=club[0], date__range=(start_date, end_date), club_against=opponent
-                ).all()
-                #print(results)
-            elif ground:
-                results = ClubPoint.objects.filter(
-                    club__name=club[0], ground=ground, date__range=(start_date, end_date),
-                ).all()
-                #print(results)
-            else:
-                results = ClubPoint.objects.filter(
-                    club__name=club[0], date__range=(start_date, end_date),
-                ).all()
-                #print(results)
-            return render(request, 'app/search_result.html', {'results':results})
-
-        """
-        
-        """
-            except:
-                
-                return HttpResponse("None")
-        """
-
-        return render(request, 'app/match_search.html', {'form': form})
-
-
-def searchform(request):
-    if request.method == "POST":
-        form = MatchForm(request.POST)
-        if form.is_valid():
-            club = form.cleaned_data['club']
-            matchweek = form.cleaned_data['matchweek']
-            outcome = form.cleaned_data['outcome']
-            print(outcome)
-            results = ClubPoint.objects.filter(club__name=club, matchweek=int(matchweek), outcome=outcome)
-            print(results)
-            return render(request, 'app/match_search_page.html', {'results': results})
-    else:
-        form = MatchForm()
-            
-    return render(request, 'app/match_search_page.html', {'form': form})

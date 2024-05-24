@@ -1,0 +1,37 @@
+{% extends 'app/base.html' %}
+{% load static %}
+
+{% block css %}
+	.gr {
+		color: linear-gradient(to right, red , yellow);
+	}
+	.gradient-color {
+		background: -webkit-linear-gradient(right, red , yellow);
+		-webkit-background-clip: text;
+		-webkit-text-fill-color: transparent;
+	}
+	.carousel .carousel-indicators button {
+		width: 10px;
+		height: 10px;
+		border-radius: 100%;
+	}
+{% endblock css %}
+
+{% block content %}
+<div class="row mt-5">
+<div class="col-12 col-sm-6">
+	<h2>Become a better <span class="gradient-color">Football Analyst</span></h2>
+	<p>Stay informed on your team historical match results, performances and find out intriguing and unique insights just like an experienced pundit </p>
+	<a href="{% url 'match-search' %}" class="btn btn-outline-primary">Start Now</a>
+</div>
+
+<div class="col-sm-6">
+	<img src="{% static 'images/uploads.png' %}" class="img-fluid" alt="image">
+</div>
+</div>
+
+<script async="async" data-cfasync="false" src="//pl23383023.highcpmgate.com/9eb8cc7d386b25d3577662a96f56de78/invoke.js"></script>
+<div id="container-9eb8cc7d386b25d3577662a96f56de78"></div>
+
+	
+{% endblock content %}

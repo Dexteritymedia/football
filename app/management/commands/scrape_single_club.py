@@ -40,9 +40,13 @@ code = "19538871"
 
 def scrape_club_history(season):
     #club_data = f"https://fbref.com/en/squads/18bb7c10/{years}/Arsenal-Stats"
-    #https://fbref.com/en/squads/206d90db/2013-2014/Barcelona-Stats
+    #https://fbref.com/en/squads/19538871/2013-2014/Manchester-United-Stats
+    #https://fbref.com/en/squads/53a2f082/2022-2023/Real-Madrid-Stats
+    #https://fbref.com/en/squads/add600ae/2022-2023/Dortmund-Stats
+
+    
     data =[]
-    club_data = f"https://fbref.com/en/squads/206d90db/{season}/Barcelona-Stats"
+    club_data = f"https://fbref.com/en/squads/add600ae/{season}/Dortmund-Stats"
     print(club_data)
     response = requests.get(club_data)
     print(response)
@@ -78,7 +82,7 @@ class Command(BaseCommand):
         print(data)
         data_to_list = [i for j in data for i in j]
         df_club_history = pd.DataFrame(data_to_list)
-        stor = os.path.join(root, f"static/data/Barcelona-{season}.csv")
+        stor = os.path.join(root, f"static/data/Dortmund-{season}.csv")
         print(stor)
         df_club_history.to_csv(stor)
 

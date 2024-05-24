@@ -8,7 +8,7 @@ register = template.Library()
 def inject_adsense_after_paragraph(value, arg):
 
     # Render our adsense code placed in html file
-    ad_code = render_to_string("app/ads.html")
+    ad_code = render_to_string("tags/ads.html")
 
     # Break down content into paragraphs
     paragraphs = value.split("</p>")

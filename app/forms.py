@@ -60,6 +60,7 @@ MATCHWEEK = (
 
 
 OUTCOME = (
+        (None, ''),
         ('W', 'Win'),
         ('D', 'Draw'),
         ('L', 'Lose'),
@@ -96,8 +97,8 @@ class ClubPointForm(forms.Form):
 
 
 class MatchForm(forms.Form): 
-    club = forms.ModelMultipleChoiceField(queryset=Team.objects.filter(league__name='Premier League'), widget=forms.SelectMultiple)
-    matchweek = forms.ChoiceField(label="Match Week", required=False, help_text='Enter a match week', choices=MATCHWEEK, widget=forms.SelectMultiple,)
+    club = forms.ModelMultipleChoiceField(queryset=Team.objects.filter(league__name='Premier League'), required=False, widget=forms.SelectMultiple)
+    matchweek = forms.ChoiceField(label="Match Week", required=False, help_text='Enter a match week', choices=MATCHWEEK, widget=forms.HiddenInput(),)
     outcome = forms.ChoiceField(label="Match Outcome", required=False, initial='D', choices=OUTCOME)
     ground = forms.ChoiceField(required=False, label="Match Ground", choices=GROUND)
     tournament = forms.ModelMultipleChoiceField(required=False, queryset=Tournament.objects.all(), widget=forms.SelectMultiple)
