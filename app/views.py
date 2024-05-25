@@ -17,6 +17,7 @@ from django.views.generic.edit import FormMixin
 from django.urls import reverse
 from django.db.models import Q
 from django.core import serializers
+from django.core.paginator import EmptyPage, PageNotAnInteger, Paginator
 
 from .models import *
 from .forms import AllClubForm, ClubPointForm, MatchForm
@@ -107,10 +108,20 @@ class SearchMatchView(View):
             print(query)
 
             results = ClubPoint.objects.filter(query).all()
-            print(results)
-            print(str(results.query))
+            #print(results)
+            #print(str(results.query))
 
-            return render(request, 'app/match_result_page.html', {'results': results})
+            paginator = Paginator(results, 50)
+
+            page = request.GET.get('page')
+            try:
+                posts = paginator.page(page)
+            except PageNotAnInteger:
+                posts = paginator.page(1)
+            except EmptyPage:
+                posts = paginator.page(paginator.num_pages)
+
+            return render(request, 'app/match_result_page.html', {'results': posts, 'page': page})
             """
             if request.user.is_authenticated:
                 return render(request, 'app/match_result_page.html', {'results': results})
@@ -135,11 +146,37 @@ def result_page(request):
 
 
 def update_data(request):
-    update_club = ClubPoint.objects.filter(club__name='Chelsea').update(club=Team.objects.get_or_create(name='Tottenham')[0])
+    #update_club = ClubPoint.objects.filter(club__name='Chelsea').update(club=Team.objects.get_or_create(name='Tottenham')[0])
 
-    update_all = ClubPoint.objects.update()
+    #update_all = ClubPoint.objects.filter(club_against__name='Eng Arsenal').update(club_against=Team.objects.get_or_create(name='Arsenal')[0])
 
     return export_csv(request)
+
+def filter_data(request):
+    start_date = '2000-08-19'
+    end_date = '2005-05-15'
+    filter_club = ClubPoint.objects.filter(club__name='Chelsea', date__range=(start_date, end_date))
+    print(filter_club.count())
+    print(len(filter_club))
+
+    season = Season.objects.all().values()
+    print(season.count())
+
+    #club_season = ClubPoint.objects.filter(club__name='Chelsea', )
+
+    return HttpResponse("Done")
+
+
+def delete_certain_data(request):
+    start_date = '2000-08-19'
+    end_date = '2005-05-15'
+    filter_club = ClubPoint.objects.filter(club__name='Manchester City').all()
+    print(filter_club.count())
+    print(len(filter_club))
+
+    #filter_club.delete()
+
+    return HttpResponse("Done")
 
 
 #####

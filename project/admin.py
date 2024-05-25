@@ -34,12 +34,16 @@ class MatchDayAdmin(admin.ModelAdmin):
 
 
 class TeamAdmin(admin.ModelAdmin):
-    list_display = ['name', 'club_logo_img',]
+    list_display = ['name', 'club_logo_img', 'number_of_matches_per_team',]
+
+
+class TournamentAdmin(admin.ModelAdmin):
+    list_display = ['__str__', 'number_of_team_entry', 'number_of_clubs_entry']
 
     
 admin.site.register(PlayerStat, PlayerStatAdmin)
 admin.site.register(Team, TeamAdmin)
-admin.site.register(Tournament)
+admin.site.register(Tournament, TournamentAdmin)
 admin.site.register(GoalStat)
 admin.site.register(AssitStat)
 admin.site.register(Player)

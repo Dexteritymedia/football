@@ -12,6 +12,14 @@ class Tournament(models.Model):
     def __str__(self):
         return self.name.title()
 
+    def number_of_team_entry(self):
+        entries = Tournament.objects.get(name=self.name)
+        return entries.tournament.count()
+
+    def number_of_clubs_entry(self):
+        entries = Tournament.objects.get(name=self.name)
+        return entries.club_tournament.count()
+
 
 class BirthYear(models.Model):
     year = models.IntegerField(unique=True)
@@ -42,7 +50,7 @@ class Team(models.Model):
     name = models.CharField(max_length=100, unique=True)
     logo = models.ImageField(upload_to='club_logos', null=True, blank=True)
     slug = models.SlugField(default=uuid.uuid4, null=True, blank=True)
-    league = models.ForeignKey(Tournament, default=None, null=True, on_delete=models.SET_NULL)
+    league = models.ForeignKey(Tournament, default=None, null=True, on_delete=models.SET_NULL, related_name='tournament',)
 
     def __str__(self):
         return self.name.title()
@@ -53,6 +61,10 @@ class Team(models.Model):
                 '<img src="/media/%s" width="50" height="50" /.>' %(self.logo)
                 )
         return None
+
+    def number_of_matches_per_team(self):
+        entries = Team.objects.get(name=self.name)
+        return entries.Club.count()
 
     @property
     def logo_url(self):
@@ -192,7 +204,7 @@ class ClubPoint(models.Model):
     date = models.DateField(blank=True, null=True)
     club = models.ForeignKey(Team, default=None, null=True, on_delete=models.SET_NULL, related_name='Club')
     club_against = models.ForeignKey(Team, default=None, null=True, on_delete=models.SET_NULL, related_name='Club_against')
-    tournament = models.ForeignKey(Tournament, default=None, null=True, on_delete=models.SET_NULL)
+    tournament = models.ForeignKey(Tournament, default=None, null=True, on_delete=models.SET_NULL, related_name='club_tournament')
     point = models.PositiveIntegerField(blank=True, null=True)
     total_point = models.PositiveIntegerField(blank=True, null=True)
     ground = models.CharField(max_length=50, choices=GROUND)

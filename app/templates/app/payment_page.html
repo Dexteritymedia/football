@@ -8,10 +8,8 @@
 
 {% block content %}
   
-  <div class="row text-center">
-  <h1>Plans that Unleash the Wow in Your Photos</h1>
-<h4>Choose the right plan for you and elevate your photos with the power
-of AI without any limitations.</h4>
+  <div class="row text-center mt-3">
+  
 </div>
 
 <div class="container">
@@ -22,8 +20,8 @@ of AI without any limitations.</h4>
   <div class="shadow bg-body rounded">
     <div class="card bg-custom-color mb-3">
       <div class="card-body" style="color: black;">
-		<h4 class="card-title">{{ plan.plan|title }}</h4>
-        <h1 class="card-title">Free</h1>
+		<h4 class="card-title">Free</h4>
+        <h1 class="card-title">$0</h1>
 		<div>
 					
 					<span>&#10003;</span>
@@ -45,7 +43,7 @@ of AI without any limitations.</h4>
   <div class="shadow bg-body rounded">
     <div class="card bg-custom-color mb-3">
       <div class="card-body" style="color: black;">
-		<h4 class="card-title">{{ plan.plan|title }}</h4>
+		<h4 class="card-title">Monthly</h4>
         <h1 class="card-title">$19.99</h1>
 		<button type="submit" class="text-center btn btn-outline-success m-3 payment-plan" data-id= "{{ plan.id }}" data-plan="{{ plan.plan }}" data-amount="{{ plan.amount }}">Pay Now</button>
 		<div>

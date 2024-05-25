@@ -1,6 +1,12 @@
 {% extends 'app/base.html' %}
 
+{% block add_script %}
+
+{% endblock add_script %}
+
 {% block content %}
+
+<div class="text-center mt-5"><h4 class="mt-4">Looking for your team match results between 2002 and 2003? Find them here. All fields below are optional, but the start and end date is needed for a search.</h4></div>
 	<div class="col-12 p-5 mt-5">
 			<form method="GET" action="">
 				<div class="row">
@@ -18,8 +24,5 @@
 					<button type="submit" class="btn btn-outline-primary mt-3">Search</button>
 				</div>
 			</form>
-			
-		<script async="async" data-cfasync="false" src="//pl23383023.highcpmgate.com/9eb8cc7d386b25d3577662a96f56de78/invoke.js"></script>
-		<div id="container-9eb8cc7d386b25d3577662a96f56de78"></div>
 	</div>
 {% endblock content %}

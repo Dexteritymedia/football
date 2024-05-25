@@ -16,7 +16,7 @@ class Command(BaseCommand):
     help = 'load data from csv'
 
     def handle(self, *args, **kwargs):
-        data = 'Chelsea-2023-2024.csv'
+        data = 'Manchester-City-2019-2020.csv'
         results = []
         with open(os.path.join(settings.BASE_DIR, 'static/data/'+data), 'r', encoding='utf8') as f:
             reader = csv.reader(f)
@@ -25,9 +25,7 @@ class Command(BaseCommand):
                 if i == 0:
                     pass
                 else:
-                    
-                    #all_rows = ''.join(row)
-                    #row = row.split()
+        
                     matchweek = row[4].replace('Matchweek ', '')
                     match_zero = 0
                     number = range(1, 39)
@@ -50,7 +48,7 @@ class Command(BaseCommand):
                     
                     obj = ClubPoint(
                         date=row[1],
-                        club=Team.objects.get(name='Chelsea'),
+                        club=Team.objects.get(name='Manchester City'),
                         season=Season.objects.get_or_create(name=row[22], year=match_year)[0],
                         tournament=Tournament.objects.get_or_create(name=row[3])[0],
                         ground=row[6],

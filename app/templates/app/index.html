@@ -18,16 +18,12 @@
 {% endblock css %}
 
 {% block content %}
-<div class="row mt-5">
-<div class="col-12 col-sm-6">
-	<h2>Become a better <span class="gradient-color">Football Analyst</span></h2>
-	<p>Stay informed on your team historical match results, performances and find out intriguing and unique insights just like an experienced pundit </p>
-	<a href="{% url 'match-search' %}" class="btn btn-outline-primary">Start Now</a>
-</div>
-
-<div class="col-sm-6">
-	<img src="{% static 'images/uploads.png' %}" class="img-fluid" alt="image">
-</div>
+<div class="container-fluid py-5 mb-5" style="background: linear-gradient(rgba(53, 53, 53, .7), rgba(53, 53, 53, .7)), url({% static 'images/header.jpg' %}) center center no-repeat; background-size: cover;">
+        <div class="container py-5">
+			<h1>Become a better <span class="gradient-color">Football Analyst</span></h1>
+			<h4>Stay informed on your team historical match results, performances and find out intriguing and unique insights just like an experienced pundit </h4>
+			<a href="{% url 'match-search' %}" class="btn btn-outline-primary">Start Now</a>  
+        </div>
 </div>
 
 <script async="async" data-cfasync="false" src="//pl23383023.highcpmgate.com/9eb8cc7d386b25d3577662a96f56de78/invoke.js"></script>

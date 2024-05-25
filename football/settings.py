@@ -116,6 +116,21 @@ DATABASES = {
 }
 
 
+"""
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.mysql',
+        'NAME': env('MYDB_NAME'),
+        'USER': env('MYDB_USER'),
+        'PASSWORD': env('MYDB_PASSWORD'),
+        'HOST': env('MYDB_HOST'),
+        'PORT':'',
+    }
+}
+
+"""
+
+
 # Password validation
 # https://docs.djangoproject.com/en/4.2/ref/settings/#auth-password-validators
 
@@ -210,3 +225,19 @@ WHITENOISE_MANIFEST_STRICT = False
 WHITENOISE_ALLOW_ALL_ORIGINS = True
 
 SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+
+"""Configuration of django-storages
+
+STATICFILES_STORAGE = "storages.backends.dropbox.DropboxStorage"
+
+
+STORAGES = {
+    "default": {
+        "BACKEND": "storages.backends.dropbox.DropboxStorage",
+        "OPTIONS": {
+          ...your_options_here
+        },
+    },
+}
+
+"""
