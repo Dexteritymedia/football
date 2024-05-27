@@ -29,7 +29,7 @@ class Command(BaseCommand):
                     
                     obj = ClubPoint(
                         date=row[2],
-                        club=Team.objects.get_or_create(name=row[9]),
+                        club=Team.objects.get_or_create(name=row[9])[0],
                         season=Season.objects.get_or_create(name=row[10], year=match_year)[0],
                         tournament=Tournament.objects.get_or_create(name=row[11])[0],
                         ground=row[8],

@@ -215,6 +215,11 @@ class ClubPoint(models.Model):
 
     class Meta:
         ordering = ['-date']
+        """
+        constraints = [
+            models.UniqueConstraint(fields=['club', 'club_against', 'date'], name='unique_match'),
+        ]
+        """
 
     def __str__(self):
         if self.ground == 'Away':

@@ -1,0 +1,12 @@
+{
+ “name”: “TheFootballAnalyst”,
+ “short_name”: “TheFootballAnalyst”,
+ “start_url”: “/”,
+ “display”: “standalone”,
+ “background_color”: “#ffffff”,
+ “theme_color”: “#67798e”,
+ “orientation”: “portrait-primary”,
+ "icons": [
+  
+]
+}

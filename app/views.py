@@ -18,6 +18,7 @@ from django.urls import reverse
 from django.db.models import Q
 from django.core import serializers
 from django.core.paginator import EmptyPage, PageNotAnInteger, Paginator
+from django.db.models import Sum, F, Count
 
 from .models import *
 from .forms import AllClubForm, ClubPointForm, MatchForm
@@ -54,6 +55,30 @@ def export_csv(request):
         writer.writerow(obj)
 
     return response
+
+
+class TeamSearchGoalView(View):
+    query = None
+    results = []
+    form_class = MatchForm
+
+    def get(self, request):
+        form = self.form_class(request.GET)
+        form.fields['outcome'].initial = None
+        if form.is_valid():
+            club = form.cleaned_data.get('club', None)
+            matchweek = form.cleaned_data['matchweek']
+            outcome = form.cleaned_data['outcome']
+            ground = form.cleaned_data.get('ground', None)
+            opponent = form.cleaned_data.get('opponent', None)
+            tournament = form.cleaned_data['tournament']
+            start_date = form.cleaned_data['start_date']
+            end_date = form.cleaned_data['end_date']
+        else:
+            return render(request, 'app/match_search.html', {'form':form})
+
+        return render(request, 'app/match_search.html', {'form': form})
+
 
 class SearchMatchView(View):
     query = None
@@ -111,9 +136,34 @@ class SearchMatchView(View):
             #print(results)
             #print(str(results.query))
 
-            paginator = Paginator(results, 50)
+            groupby = ClubPoint.objects.filter(query).values('outcome').annotate(match_outcome=Count('outcome'))
+            print(groupby)
+
+            value_list = ClubPoint.objects.filter(query).values_list('outcome', flat=True).distinct()
+            print(value_list)
+
+            group_by_value = {}
+            for value in value_list:
+                group_by_value[value] = ClubPoint.objects.filter(query).filter(outcome=value)
+
+            print(type(group_by_value))
+
+            """
+            qs = (
+                ClubPoint.objects.filter(query)
+                .select_related("b", "c", "d")  # This is the join. You'll need to use the reverse-lookups, forward-lookups
+                .values("b__name", "d__id") # This will produce a group by
+                .annotate(Sum(all_data="all_data"), Sum(today_data="today_data")  # This is the aggregation part
+                          .values("standard_name")  # Here put all the other fields
+                          .order_by("b__type", "b__name")  # finally the order by
+                          )
+                )
+            """
+
+            paginator = Paginator(results, 10)
 
             page = request.GET.get('page')
+            page_obj = paginator.get_page(page)
             try:
                 posts = paginator.page(page)
             except PageNotAnInteger:
@@ -121,7 +171,7 @@ class SearchMatchView(View):
             except EmptyPage:
                 posts = paginator.page(paginator.num_pages)
 
-            return render(request, 'app/match_result_page.html', {'results': posts, 'page': page})
+            return render(request, 'app/match_result_page.html', {'results': group_by_value, 'page_obj': page_obj})
             """
             if request.user.is_authenticated:
                 return render(request, 'app/match_result_page.html', {'results': results})
@@ -170,7 +220,8 @@ def filter_data(request):
 def delete_certain_data(request):
     start_date = '2000-08-19'
     end_date = '2005-05-15'
-    filter_club = ClubPoint.objects.filter(club__name='Manchester City').all()
+    filter_club = ClubPoint.objects.all()
+    #filter_club = ClubPoint.objects.filter(club__name='Manchester City').all()
     print(filter_club.count())
     print(len(filter_club))
 

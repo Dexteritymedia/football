@@ -10,24 +10,24 @@
 				<tr>
 					<th scope="col">Season</th>
 					<th scope="col">Club</th>
-					<th scope="col">Outcome</th>
 					<th scope="col">MatchWeek</th>
 				</tr>
 			</thead>
-			<tbody>
-			{% for result in results %}
-				<tr class="">
-					<th scope="row">{{ result.season }}</</th>
-	
-						<td><img src="{{ result.club_against.logo_url }}" width="50px" height="50px" class="img-fluid" alt="{{ result.club_against }}"></td>
-					
-					<td>{{ result.outcome }}</td>
-					<td>{{ result.matchweek }}</td>
-				</tr>
+			
+			
+			{% for key, values in results.items %}
+				{% for v in values %} 
+				<tbody>
+					<tr class="">
+					<th scope="row">{{v.season}}</th>
+					<td><img src="{{ v.club_against.logo_url }}" width="50px" height="50px" class="img-fluid" alt="{{ v.club_against }}"></td>
+					<td>{{ v.matchweek }}</td>
+					</tr>
+				</tbody>
+				{% endfor %}
 			{% endfor %}
 		</table>
 	</div>
-	
 	
 	{% if results.paginator.num_pages > 1 %}
 							<div class="container">
