@@ -212,5 +212,66 @@
 </div>
 
 
+{% comment %}
+<div class="container">
+<div class="row my-3 mb-5 row-cols-1 row-cols-md-3 g-4">
+	{% if results %}
+	
+			{% for key, values in results.items %}
+
+			<div class="col-4 mt-4">
+  <div class="shadow bg-body rounded">
+    <div class="card bg-custom-color mb-3">
+      <div class="card-body" style="color: black;">
+		{% if key == 'L' %}
+			<h4 class="card-title">Loses</h4>
+			<h1 class="card-title">{{values|length}}</h1>
+		{% elif key == 'W' %}
+			<h4 class="card-title">Wins</h4>
+			<h1 class="card-title">{{values|length}}</h1>
+		{% elif key == 'D' %}
+			<h4 class="card-title">Draws</h4>
+			<h1 class="card-title">{{values|length}}</h1>
+		{% else %}
+			<h4 class="card-title">{{key}}</h4>
+			<h1 class="card-title">{{values|length}}</h1>
+		{% endif %}
+		</div>
+		</div>
+		</div>
+		</div>
+		</div>
+		</div>
+		
+		<div class="table-responsive">
+		<table class="table table-striped table-hover">
+			<thead>
+				<tr>
+					<th scope="col">Season</th>
+					<th scope="col">Club</th>
+					<th scope="col">Scoreline</th>
+					<th scope="col">MatchWeek</th>
+				</tr>
+			</thead>
+				{% for v in values %} 
+				<tbody>
+					<tr class="">
+					<th scope="row">{{v.season}}</th>
+					<td><img src="{{ v.club_against.logo_url }}" width="50px" height="50px" class="img-fluid" alt="{{ v.club_against }}"></td>
+					<td>{{ v.goals_scored }} - {{ v.goals_against }}</td>
+					{% if v.matchweek == 0 %}
+						<td>{{ v.tournament }}</td>
+					{% else %}
+						<td>MatchWeek: {{ v.matchweek }}</td>
+					{% endif %}
+					</tr>
+				</tbody>
+				{% endfor %}
+		</table>
+	</div>
+	{% endfor %}
+{% endcomment %}
+
+
 	
 {% endblock content %}

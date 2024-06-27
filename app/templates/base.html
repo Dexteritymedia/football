@@ -4,14 +4,31 @@
 <html lang="en" data-bs-theme="dark">
 
 <head>
+    <!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=AW-806559881"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'AW-806559881');
+</script>
     <meta charset="utf-8">
-	
+
     <title>TheFootballAnalyst {% block title %}{% endblock title %}- {% block title_suffix %} {% endblock title_suffix %}</title>
-	
+
     <meta content="width=device-width, initial-scale=1.0" name="viewport">
+    {% block meta_description %}
     <meta content="" name="keywords">
     <meta content="" name="description">
-	{% block meta_description %}{% endblock meta_description %}
+    {% endblock meta_description %}
+    <meta property="og:url"           content="https://footballanalysis.pythonanywhere.com" />
+    <meta property="og:type"          content="website" />
+    <meta property="og:title"         content="TheFootballAnalyst"/>
+    <meta property="og:description"   content="Your description" />
+    <meta property="og:image"         content="{{ request.build_absolute_uri }}{% static 'images/header.jpg' %}" />
+    <meta name="google-site-verification" content="dHuAYWpHwsgJMaPbyJS4FhrBU4uD1iHbm4QgEwrLYFg" />
+	{% block meta_desc %}{% endblock meta_desc %}
 
     <!-- Favicon -->
     <link href="img/favicon.ico" rel="icon">
@@ -19,7 +36,7 @@
     <!-- Google Web Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    
+
 	<link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@500&display=swap" rel="stylesheet">
 
     <!-- Icon Font Stylesheet -->
@@ -39,13 +56,13 @@
 		body, h1, .h1, h2, .h2, h3, .h3, h4, .h4, h5, .h5, h6, .h6  {
 			font-family: "Quicksand" !important;
 		}
-		
+
 		.gradient-color {
 			background: -webkit-linear-gradient(right, red , yellow);
 			-webkit-background-clip: text;
 			-webkit-text-fill-color: transparent;
 		}
-		
+
 		.btn-outline-primary {
 			background: -webkit-linear-gradient(right, red , yellow) !important;
 			background-color: -webkit-linear-gradient(right, red , yellow) !important;
@@ -65,40 +82,41 @@
 	{% block add_script %}
 	<script type='text/javascript' src='//pl23391657.highcpmgate.com/41/45/9e/41459ec5448c0c02e36ad59fb07911f2.js'></script>
 	{% endblock add_script %}
+	<meta name="monetag" content="502c869fbf32d4f921363e7d582a829e">
+	<script src="https://alwingulla.com/88/tag.min.js" data-zone="69369" async data-cfasync="false"></script>
 </head>
-
 <body>
 
 <div class="container-fluid">
 		<div class="row mt-5">
-		
+
 			{% block navigation %}
 			{% endblock navigation %}
-		
+
 			{% block content %}
 			{% endblock content %}
-			
+
 			<script async="async" data-cfasync="false" src="//pl23383023.highcpmgate.com/9eb8cc7d386b25d3577662a96f56de78/invoke.js"></script>
 			<div id="container-9eb8cc7d386b25d3577662a96f56de78"></div>
-			
+
 			<script type='text/javascript' src='//pl23399228.highcpmgate.com/81/df/c4/81dfc490ed55eb24f13bd9db8b617710.js'></script>
-			
+
 			{% block footer %}
 			{% endblock footer %}
 		</div>
 	</div>
-	
-	
+
+
 	<script>
       if ("serviceWorker" in navigator) {
         navigator.serviceWorker
-          .register("/serviceworker.js", { scope: "/" })
+          .register("{% static 'js/serviceworker.js' %}", { scope: "/" })
           .then((registration) => {
             registration.unregister().then((boolean) => {
             });
           })
           .catch((error) => {
-            
+
           });
       }
 	</script>

@@ -73,6 +73,11 @@ GROUND = (
         ('Away', 'Away'),
     )
 
+GOALS_TYPE = (
+        ('GF', 'Goals scored'),
+        ('GA', 'Goals conceded'),
+    )
+
 class UserRegisterForm(UserCreationForm):
     class Meta:
         model = User
@@ -98,11 +103,19 @@ class ClubPointForm(forms.Form):
 
 
 class MatchForm(forms.Form): 
-    club = forms.ModelMultipleChoiceField(queryset=Team.objects.filter(league__name='Premier League'), widget=forms.SelectMultiple)
+    club = forms.ModelChoiceField(queryset=Team.objects.filter(league__name='Premier League'))
     matchweek = forms.ChoiceField(label="Match Week", required=False, help_text='Enter a match week', choices=MATCHWEEK, widget=forms.HiddenInput(),)
     outcome = forms.ChoiceField(label="Match Outcome", required=False, initial='D', choices=OUTCOME, widget=forms.HiddenInput())
     ground = forms.ChoiceField(required=False, label="Match Ground", choices=GROUND)
-    tournament = forms.ModelMultipleChoiceField(required=False, queryset=Tournament.objects.all(), widget=forms.SelectMultiple)
-    opponent = forms.ModelMultipleChoiceField(required=False, queryset=Team.objects.filter(league__name='Premier League'), widget=forms.SelectMultiple)
+    tournament = forms.ModelChoiceField(required=False, queryset=Tournament.objects.all())
+    opponent = forms.ModelChoiceField(required=False, queryset=Team.objects.filter(league__name='Premier League'))
     start_date = forms.DateField(label="Start Date",widget=forms.DateInput(attrs={"class":"form-control", "type":"date", "id":"start_date"}))
     end_date = forms.DateField(label="End Date",widget=forms.DateInput(attrs={"class":"form-control", "type":"date", "id":"end_date"}))
+
+
+class TeamGoalForm(forms.Form): 
+    club = forms.ModelChoiceField(queryset=Team.objects.filter(league__name='Premier League'))
+    no_of_goals = forms.IntegerField(initial=2)
+    goals = forms.ChoiceField(choices=GOALS_TYPE, widget=forms.HiddenInput())
+    start_date = forms.DateField(label="Start Date", required=False, widget=forms.DateInput(attrs={"class":"form-control", "type":"date", "id":"start_date"}))
+    end_date = forms.DateField(label="End Date", required=False, widget=forms.DateInput(attrs={"class":"form-control", "type":"date", "id":"end_date"}))

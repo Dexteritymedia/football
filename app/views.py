@@ -18,10 +18,10 @@ from django.urls import reverse
 from django.db.models import Q
 from django.core import serializers
 from django.core.paginator import EmptyPage, PageNotAnInteger, Paginator
-from django.db.models import Sum, F, Count
+from django.db.models import Sum, F, Count, Func, Window, Avg, Max, Min
 
 from .models import *
-from .forms import AllClubForm, ClubPointForm, MatchForm
+from .forms import AllClubForm, ClubPointForm, MatchForm, TeamGoalForm
 
 User = get_user_model()
 
@@ -35,6 +35,86 @@ def home(request):
 def payment_page(request):
     context ={}
     return render(request, 'app/payment_page.html', context)
+
+
+def team_list_page(request):
+    #teams = Team.objects.all()
+    teams = Team.objects.filter(Q(league__name='Premier League')| Q(league__name='La Liga')| Q(league__name='Bundesliga'))
+    latest_season = Season.objects.last()
+    context = {'teams': teams, 'season':latest_season}
+    return render(request, 'app/team_list.html', context)
+
+
+def team_goal_analysis_page(request, team, slug, season):
+    team = Team.objects.get(name=team, slug=slug)
+    #season = Season.objects.get(name=season, year=2024)
+    team_data = ClubPoint.objects.filter(club__name=team, season__name=season)
+    queryset = Q()
+    #queryset = Q(tournament__name='Premier League')| Q(tournament__name='La Liga')
+    total_goals_scored = ClubPoint.objects.filter(club__name=team, season__name=season).aggregate(gs=Sum('goals_scored'), gc=Sum('goals_against'))
+    #goals_conceded= ClubPoint.objects.filter(club__name=team, season__name=season).aggregate(Sum('goals_against'))
+    #ClubPoint.objects.filter(club__name=team, season=season)
+    goal_diff = ClubPoint.objects.filter(club__name=team, season__name=season,).filter(queryset).annotate(gd=Sum(F('goals_scored')+F('goals_against')))
+    cumulative_goals = ClubPoint.objects.filter(
+        club__name=team,
+        season__name=season,
+        #tournament__name='Premier League',
+        ).annotate(
+            cumbalance=Window(Sum('goals_scored'), order_by=F('matchweek').asc())
+            ).order_by('matchweek')
+    """
+    annotate(
+        cumsum=Func(
+        Sum('goals_scored'),
+        template='%(expressions)s OVER (ORDER BY %(order_by)s)',
+        order_by="matchweek"
+        )
+    ).values('matchweek', 'cumsum').order_by('matchweek', 'cumsum')
+    """
+    value_list = ClubPoint.objects.filter(
+        club__name=team,
+        season__name=season,
+        tournament__name="Premier League"
+        ).values_list('club_against__name', flat=True).order_by('club_against').distinct()
+
+    print(value_list)
+    group_by_value = {}
+    for value in value_list:
+        group_by_value[value] = team_data.filter(club_against__name=value).order_by('ground').distinct()
+
+    #team_groupby = team_data.values('outcome').annotate(match_outcome=Count('outcome'))
+
+    print('Team', group_by_value)
+
+    team_value_list = team_data.values_list('outcome', flat=True).order_by('outcome').distinct()
+
+    group_by_team_value = {}
+    for value in team_value_list:
+        group_by_team_value[value] = team_data.filter(outcome=value)
+
+
+
+
+    context = {
+        'team_data':team_data,
+        'team':team,
+        
+        'goals_scored':total_goals_scored,
+        'goal_diff':goal_diff,
+        'c_goals':cumulative_goals,
+        
+        'group_by_value':group_by_value,
+        'value_list':value_list,
+        
+        #'team_groupby': team_groupby,
+        
+        'team_value_list': team_value_list,
+        'group_by_team_value': group_by_team_value,
+        
+        #'goals_conceded':goals_conceded
+    }
+
+    return render(request, 'app/goal_analysis.html', context)
 
 
 def export_csv(request):
@@ -60,24 +140,40 @@ def export_csv(request):
 class TeamSearchGoalView(View):
     query = None
     results = []
-    form_class = MatchForm
+    form_class = TeamGoalForm
 
     def get(self, request):
         form = self.form_class(request.GET)
-        form.fields['outcome'].initial = None
         if form.is_valid():
             club = form.cleaned_data.get('club', None)
-            matchweek = form.cleaned_data['matchweek']
-            outcome = form.cleaned_data['outcome']
-            ground = form.cleaned_data.get('ground', None)
-            opponent = form.cleaned_data.get('opponent', None)
-            tournament = form.cleaned_data['tournament']
+            no_of_goals = form.cleaned_data['no_of_goals']
+            goals = form.cleaned_data['goals']
             start_date = form.cleaned_data['start_date']
             end_date = form.cleaned_data['end_date']
-        else:
-            return render(request, 'app/match_search.html', {'form':form})
+            print(goals)
 
-        return render(request, 'app/match_search.html', {'form': form})
+            query = Q()
+
+            if start_date and start_date != "null":
+                query &= Q(date=start_date)
+
+            if end_date and end_date != "null":
+                query &= Q(date=end_date)
+
+            value_list = ClubPoint.objects.filter(club=club, goals_scored=int(no_of_goals)).filter(query).values_list('outcome', flat=True).order_by('outcome').distinct()
+            print(value_list)
+            group_by_value = {}
+            for value in value_list:
+                group_by_value[value] = ClubPoint.objects.filter(club=club, goals_scored=int(no_of_goals), outcome=value).filter(query)
+
+            print(group_by_value)
+
+            return render(request, 'app/team_goals_result_page.html', {'results': group_by_value, 'club':club,})
+            
+        else:
+            return render(request, 'app/team_search_goal.html', {'form':form})
+
+        return render(request, 'app/team_search_goal.html', {'form': form})
 
 
 class SearchMatchView(View):
@@ -112,7 +208,7 @@ class SearchMatchView(View):
             query &= Q(date__range=(start_date, end_date))
 
             if club and club != "null":
-                query &= Q(club=club[0])
+                query &= Q(club=club)
             
             if matchweek and matchweek != "null":
                 query &= Q(matchweek=matchweek)
@@ -121,10 +217,10 @@ class SearchMatchView(View):
                 query &= Q(outcome=outcome)
 
             if tournament and tournament != "null":
-                query &= Q(tournament=tournament[0])
+                query &= Q(tournament=tournament)
 
             if opponent and opponent != "null":
-                query &= Q(club_against__name=opponent[0])
+                query &= Q(club_against__name=opponent)
                 print('Opponent', query)
 
             if ground and ground != "null":
@@ -139,7 +235,7 @@ class SearchMatchView(View):
             groupby = ClubPoint.objects.filter(query).values('outcome').annotate(match_outcome=Count('outcome'))
             print(groupby)
 
-            value_list = ClubPoint.objects.filter(query).values_list('outcome', flat=True).distinct()
+            value_list = ClubPoint.objects.filter(query).values_list('outcome', flat=True).order_by('outcome').distinct()
             print(value_list)
 
             group_by_value = {}
@@ -171,7 +267,10 @@ class SearchMatchView(View):
             except EmptyPage:
                 posts = paginator.page(paginator.num_pages)
 
-            return render(request, 'app/match_result_page.html', {'results': group_by_value, 'page_obj': page_obj})
+            return render(request, 'app/match_result_page.html', {
+                'results': group_by_value, 'page_obj': page_obj, 'club':club,
+                'opponent':opponent, 'tournament':tournament, 'start_date': start_date, 'end_date':end_date,
+                })
             """
             if request.user.is_authenticated:
                 return render(request, 'app/match_result_page.html', {'results': results})

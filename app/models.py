@@ -2,6 +2,7 @@ import uuid
 
 from django.db import models
 from django.utils.safestring import mark_safe
+from django.urls import reverse
 
 # Create your models here.
 
@@ -55,16 +56,30 @@ class Team(models.Model):
     def __str__(self):
         return self.name.title()
 
+    def get_absolute_url(self):
+        # Ensure this value is URL-friendly
+        return reverse('team-list-page')
+
     def club_logo_img(self):
+        #for image to appear in admin
         if self.logo:
             return mark_safe(
                 '<img src="/media/%s" width="50" height="50" /.>' %(self.logo)
                 )
         return None
 
+    @property
+    def logo_url(self):
+        try:
+            url = self.logo.url
+        except:
+            url = ''
+        return url
+
+
     def number_of_matches_per_team(self):
         entries = Team.objects.get(name=self.name)
-        return entries.Club.count()
+        return entries.Club_against.count()
 
     @property
     def logo_url(self):
@@ -225,6 +240,17 @@ class ClubPoint(models.Model):
         if self.ground == 'Away':
             return f'{self.club_against}-{self.club} {self.outcome} {self.ground}'
         return f'{self.club}-{self.club_against} {self.outcome} {self.ground}'
+
+    def get_absolute_url(self):
+    
+        return reverse(
+            'goal-analysis-page',
+            kwargs={
+                'team': self.club.name,
+                'slug': self.club.slug,
+                'season': self.season.name
+            }
+        )
     
     def save(self, *args, **kwargs):
         from django.db.models import Sum, F

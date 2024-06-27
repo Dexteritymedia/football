@@ -21,6 +21,7 @@ from django.urls import path, include, re_path
 from django.conf.urls.static import static
 from django.conf import settings
 from django.views.generic.base import RedirectView
+from django.contrib.sitemaps.views import sitemap, index
 
 from wagtail import urls as wagtail_urls
 from wagtail.admin import urls as wagtailadmin_urls
@@ -28,6 +29,7 @@ from wagtail.documents import urls as wagtaildocs_urls
 #from wagtail.contrib.sitemaps.views import sitemap
 from wagtail.contrib.sitemaps import views as sitemaps_views
 from wagtail.contrib.sitemaps import Sitemap
+from app.sitemaps import TeamSitemap, TeamListSitemap, StaticSitemap
 
 import environ
 
@@ -38,9 +40,35 @@ environ.Env.read_env(os.path.join(settings.BASE_DIR, '.env'))
 ADMIN_URL = env('ADMIN_URL')
 BLOG_ADMIN_URL = env('BLOG_ADMIN_URL')
 
+
+sitemaps = {
+    'team-analysis': TeamSitemap,
+    'static': StaticSitemap,
+    'teams': TeamListSitemap,
+}
+list_sitemaps = {
+    'teams': TeamListSitemap,
+    'static': StaticSitemap,
+}
+
 urlpatterns = [
     path(f'{ADMIN_URL}/', admin.site.urls),
     path('', include('app.urls')),
+
+    path(
+        "sports-sitemap.xml/",
+        sitemap,
+        {"sitemaps": sitemaps},
+        name="django.contrib.sitemaps.views.sitemap",
+    ),
+
+    #submitted sitemap to google
+    path('sitemap-list.xml/', index, {'sitemaps': sitemaps}, name='django.contrib.sitemaps.views.index'),
+    # sitemap-<section>.xml here <section> will be replaced by the key from sitemaps dict
+    path('sitemap-<section>.xml/', sitemap, {'sitemaps': sitemaps}, name='django.contrib.sitemaps.views.sitemap'),
+
+    path('list-sitemap.xml/', sitemap, {'sitemaps': list_sitemaps}, name='django.contrib.sitemaps.views.sitemap'),
+
     
     #path('sitemap.xml', sitemap),
     #re_path(r'^sitemap\.xml$', sitemaps_views.sitemap),

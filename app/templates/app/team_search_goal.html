@@ -5,9 +5,8 @@
 {% endblock add_script %}
 
 {% block content %}
-
 <div class="text-center mt-5">
-    <h1>
+<h1>
         The most comprehensive head-to-head records for teams in the Premier League, La Liga,
  Serie A, Bundesliga</h1><h4 class="mt-4">Looking for your team match results between 2002 and 2018? Find them here. All fields below are optional, but the start and end date is needed for a search.</h4></div>
 	<div class="col-12 p-3">
@@ -16,9 +15,8 @@
 				{% for field in form %}
 					{% if field.is_hidden %}
 						{% else %}
-						<div class="col-md-3 col-12 mb-3">
-							<h5 class="display-6">{{ field.label_tag }}</h5>
-							<div>{{ field }}</div>
+						<div class="col-md-12 col-12 mb-3">
+							<h5 class="display-6">{{ field.label_tag }} {{ field }}</h5>
 						</div>
 						{% endif %}
 				{% endfor %}

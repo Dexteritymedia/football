@@ -3,9 +3,12 @@ from . import views
 
 urlpatterns = [
     path('', views.home, name='home'),
-    path('match-search/', views.SearchMatchView.as_view(), name='match-search'),
+    path('head-to-head-search/', views.SearchMatchView.as_view(), name='match-search'),
     path('pricing/', views.payment_page, name='payment-page'),
     path('result-page/', views.result_page, name='result-page'),
+    path('teams/', views.team_list_page, name='team-list-page'),
+    path('<team>-goals-breakdown/<slug>/<season>/', views.team_goal_analysis_page, name='goal-analysis-page'),
+    path('team-goal-search/', views.TeamSearchGoalView.as_view(), name='team-goal-search'),
 
     path('export/', views.export_csv, name='export-csv'),
     path('update/', views.update_data, name='update-data'),
