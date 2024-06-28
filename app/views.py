@@ -148,27 +148,27 @@ class TeamSearchGoalView(View):
             club = form.cleaned_data.get('club', None)
             no_of_goals = form.cleaned_data['no_of_goals']
             goals = form.cleaned_data['goals']
-            start_date = form.cleaned_data['start_date']
-            end_date = form.cleaned_data['end_date']
+            date = form.cleaned_data['date']
             print(goals)
 
+            print(club)
+            
             query = Q()
 
-            if start_date and start_date != "null":
-                query &= Q(date=start_date)
+            if date and date != "null":
+                query &= Q(date__gte=date)
 
-            if end_date and end_date != "null":
-                query &= Q(date=end_date)
+                
 
             value_list = ClubPoint.objects.filter(club=club, goals_scored=int(no_of_goals)).filter(query).values_list('outcome', flat=True).order_by('outcome').distinct()
-            print(value_list)
+            print('value', value_list)
             group_by_value = {}
             for value in value_list:
                 group_by_value[value] = ClubPoint.objects.filter(club=club, goals_scored=int(no_of_goals), outcome=value).filter(query)
 
             print(group_by_value)
 
-            return render(request, 'app/team_goals_result_page.html', {'results': group_by_value, 'club':club,})
+            return render(request, 'app/team_goals_result_page.html', {'results': group_by_value, 'club':club, 'goals':no_of_goals, 'date':date})
             
         else:
             return render(request, 'app/team_search_goal.html', {'form':form})

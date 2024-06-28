@@ -6,14 +6,76 @@
 .bg-custom-color {
 	background-image: linear-gradient(#FFFDD0, #FFFFDF);
 }
+
+/* Fixed/sticky icon bar (vertically aligned 50% from the top of the screen) */
+.icon-bar {
+  position: fixed;
+  top: 50%;
+  -webkit-transform: translateY(-50%);
+  -ms-transform: translateY(-50%);
+  transform: translateY(-50%);
+}
+
+/* Style the icon bar links */
+.icon-bar a {
+  display: block;
+  text-align: center;
+  padding: 16px;
+  transition: all 0.3s ease;
+  color: white;
+  font-size: 20px;
+}
+
+/* Style the social media icons with color, if you want */
+.icon-bar a:hover {
+  background-color: #000;
+}
+
+.facebook {
+  background: #3B5998;
+  color: white;
+}
+
+.twitter {
+  background: #55ACEE;
+  color: white;
+}
+
+.whatsapp {
+  background: #075E54;
+  color: white;
+}
+
+.linkedin {
+  background: #007bb5;
+  color: white;
+}
+
+.reddit {
+  background: #bb0000;
+  color: white;
+}
 {% endblock css %}
 
 {% block content %}
 
 {% if results %}
 
+<div class="col-3">
+<div class="icon-bar">
+    <p> <b>Share</b></p>
+  <a data-href="{{ request.build_absolute_uri }}"
+data-layout="button_count" class="facebook"><i class='fab fa-facebook-f' style="font-size:24px"></i></a>
+  <a href="{{ request.build_absolute_uri }}" class="twitter"><i class="fab fa-twitter"></i></a>
+  <a href="{{ request.build_absolute_uri }}" class="whatsapp"><i class="fab fa-whatsapp"></i></a>
+  <a href="{{ request.build_absolute_uri }}" class="linkedin"><i class="fab fa-linkedin"></i></a>
+  <a href="{{ request.build_absolute_uri }}" class="reddit"><i class="fab fa-reddit"></i></a>
+</div>
+</div>
+<div class="col-9"></div>
+
 <div class="mt-3">
-	<h1 class="text-center">{% if start_date %} {{club}} {{}} {{start_date}} {% endif %}</h1>
+	<h1 class="text-center">{% if date %} {{club}} all match results with {{goals}} goals from {{date}} {% else %} {{club}} all match results with {{goals}} goals {% endif %}</h1>
 	<div class="accordion accordion-flush" id="accordionFlushExample">
 	{% for key, values in results.items %}
   <div class="accordion-item">
@@ -45,7 +107,7 @@
 				<tbody>
 					<tr class="">
 					<th scope="row">{{v.season}}</th>
-					<td><img src="{{ v.club_against.logo_url }}" width="50px" height="50px" class="img-fluid" alt="{{ v.club_against }}"></td>
+					<td>{% comment %}<img src="{{ v.club_against.logo_url }}" width="50px" height="50px" class="img-fluid" alt="{{ v.club_against }}">{% endcomment %} {{v.club_against}}</td>
 					<td>{{ v.goals_scored }} - {{ v.goals_against }}</td>
 					{% if v.matchweek == 0 %}
 						<td>{{ v.tournament }}</td>

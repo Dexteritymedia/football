@@ -116,6 +116,5 @@ class MatchForm(forms.Form):
 class TeamGoalForm(forms.Form): 
     club = forms.ModelChoiceField(queryset=Team.objects.filter(league__name='Premier League'))
     no_of_goals = forms.IntegerField(initial=2)
-    goals = forms.ChoiceField(choices=GOALS_TYPE, widget=forms.HiddenInput())
-    start_date = forms.DateField(label="Start Date", required=False, widget=forms.DateInput(attrs={"class":"form-control", "type":"date", "id":"start_date"}))
-    end_date = forms.DateField(label="End Date", required=False, widget=forms.DateInput(attrs={"class":"form-control", "type":"date", "id":"end_date"}))
+    goals = forms.ChoiceField(choices=GOALS_TYPE, required=False, widget=forms.HiddenInput())
+    date = forms.DateField(label="Date", required=False, widget=forms.DateInput(attrs={"class":"form-control", "type":"date", "id":"start_date"}))
