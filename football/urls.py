@@ -29,6 +29,7 @@ from wagtail.documents import urls as wagtaildocs_urls
 #from wagtail.contrib.sitemaps.views import sitemap
 from wagtail.contrib.sitemaps import views as sitemaps_views
 from wagtail.contrib.sitemaps import Sitemap
+
 from app.sitemaps import TeamSitemap, TeamListSitemap, StaticSitemap
 
 import environ
@@ -73,18 +74,15 @@ urlpatterns = [
     #path('sitemap.xml', sitemap),
     #re_path(r'^sitemap\.xml$', sitemaps_views.sitemap),
     
-    re_path(r'^sitemap\.xml$', sitemaps_views.index, {
+    path('sitemap-index.xml/', sitemaps_views.index, {
         'sitemaps': {
             'pages': Sitemap
         },
         'sitemap_url_name': 'sitemap',
     }),
-    re_path(r'^sitemap-index\.xml$', sitemaps_views.index, {
-        'sitemaps': {'pages': Sitemap},
-        'sitemap_url_name': 'sitemap',
-    }),
-    
-    re_path(r'^sitemap-(?P<section>.+)\.xml$', sitemaps_views.sitemap, name='sitemap'),
+
+    #wagtail sitemap
+    re_path(r'^blog-sitemap-(?P<section>.+)\.xml$', sitemaps_views.sitemap, {'sitemaps': sitemaps}, name='sitemap'),
     #path('sitemap-pages.xml/', sitemaps_views.sitemap, name='sitemap'),
 
 

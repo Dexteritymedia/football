@@ -45,20 +45,67 @@ def team_list_page(request):
     return render(request, 'app/team_list.html', context)
 
 
+def brazilian_league_team_list_page(request):
+    teams = Team.objects.filter(Q(league__name='Premier League')| Q(league__name='La Liga')| Q(league__name='Bundesliga'))
+    latest_season = Season.objects.last()
+    context = {'teams': teams, 'season':latest_season}
+    return render(request, 'app/brazilian_league_team_list.html', context)
+
+
+def team_goal_chart(request, team):
+    labels = []
+    data = []
+
+    queryset = ClubPoint.objects.filter(
+        club__name=team,
+        #season__name=season,
+        tournament__name='Premier League',
+        ).annotate(
+            cumbalance=Window(Sum('goals_scored'), order_by=F('matchweek').asc())
+            ).order_by('matchweek')
+
+    
+    for entry in queryset:
+        labels.append(entry.matchweek)
+        data.append(entry.cumbalance)
+    
+    return JsonResponse(data={
+        'labels': labels,
+        'data': data,
+    })
+
+
 def team_goal_analysis_page(request, team, slug, season):
     team = Team.objects.get(name=team, slug=slug)
     #season = Season.objects.get(name=season, year=2024)
-    team_data = ClubPoint.objects.filter(club__name=team, season__name=season)
+    all_seasons = Season.objects.all().exclude(name=season).order_by('-name').distinct()
+    last_five_seasons = all_seasons[:5]
+
+    last_five_seasons_goals = []
+    for prev_season in last_five_seasons:
+        total_goals = ClubPoint.objects.filter(club__name=team, season__name=prev_season).aggregate(gs=Sum('goals_scored'), gc=Sum('goals_against'))
+        last_five_seasons_goals.append(total_goals)
+        
+    prev_seasons_results = zip(last_five_seasons, last_five_seasons_goals)
+    
+    team_data = ClubPoint.objects.filter(club__name=team, tournament__name='Premier League', season__name=season)
+    team_season = team_data.values_list('date__year', flat=True).order_by('date__year').distinct()
+    print(team_season)
+    
     queryset = Q()
     #queryset = Q(tournament__name='Premier League')| Q(tournament__name='La Liga')
-    total_goals_scored = ClubPoint.objects.filter(club__name=team, season__name=season).aggregate(gs=Sum('goals_scored'), gc=Sum('goals_against'))
-    #goals_conceded= ClubPoint.objects.filter(club__name=team, season__name=season).aggregate(Sum('goals_against'))
-    #ClubPoint.objects.filter(club__name=team, season=season)
-    goal_diff = ClubPoint.objects.filter(club__name=team, season__name=season,).filter(queryset).annotate(gd=Sum(F('goals_scored')+F('goals_against')))
+    
+    total_goals_scored = ClubPoint.objects.filter(club__name=team, tournament__name='Premier League', season__name=season).aggregate(gs=Sum('goals_scored'), gc=Sum('goals_against'))
+    total_home_goals_scored = ClubPoint.objects.filter(club__name=team, tournament__name='Premier League', ground='Home', season__name=season).aggregate(gs=Sum('goals_scored'), gc=Sum('goals_against'))
+    total_away_goals_scored = ClubPoint.objects.filter(club__name=team, tournament__name='Premier League', ground='Away', season__name=season).aggregate(gs=Sum('goals_scored'), gc=Sum('goals_against'))
+    total_clean_sheet = ClubPoint.objects.filter(club__name=team, tournament__name='Premier League', season__name=season, goals_against=0).aggregate(gc=Count('goals_against'))
+    max_min_goal = ClubPoint.objects.filter(club__name=team, tournament__name='Premier League', season__name=season).aggregate(gs=Max('goals_scored'), gc=Max('goals_against'))
+
+    goal_diff = ClubPoint.objects.filter(club__name=team, tournament__name='Premier League', season__name=season,).filter(queryset).annotate(gd=Sum(F('goals_scored')+F('goals_against')))
     cumulative_goals = ClubPoint.objects.filter(
         club__name=team,
         season__name=season,
-        #tournament__name='Premier League',
+        tournament__name='Premier League',
         ).annotate(
             cumbalance=Window(Sum('goals_scored'), order_by=F('matchweek').asc())
             ).order_by('matchweek')
@@ -92,14 +139,37 @@ def team_goal_analysis_page(request, team, slug, season):
     for value in team_value_list:
         group_by_team_value[value] = team_data.filter(outcome=value)
 
+    data = ClubPoint.objects.filter(Q(club__league__name='Premier League')).order_by('club').distinct()
+    print(data)
 
+    team_home_games = team_data.filter(ground='Home').values_list('outcome', flat=True).order_by('outcome').distinct()
+
+    group_by_team_home_games = {}
+    for value in team_home_games:
+        group_by_team_home_games[value] = team_data.filter(ground='Home').filter(outcome=value)
+
+
+    team_away_games = team_data.filter(ground='Away').values_list('outcome', flat=True).order_by('outcome').distinct()
+
+    group_by_team_away_games = {}
+    for value in team_away_games:
+        group_by_team_away_games[value] = team_data.filter(ground='Away').filter(outcome=value)
 
 
     context = {
         'team_data':team_data,
         'team':team,
+        'season':team_season,
+        'clean_sheet': total_clean_sheet,
+        'max_min_goal': max_min_goal,
+        'seasons': all_seasons,
+        'prev_seasons': last_five_seasons,
+        'prev_five_seasons_goals': last_five_seasons_goals,
+        'prev_seasons_results': prev_seasons_results,
         
         'goals_scored':total_goals_scored,
+        'home_goals_scored': total_home_goals_scored,
+        'away_goals_scored': total_away_goals_scored,
         'goal_diff':goal_diff,
         'c_goals':cumulative_goals,
         
@@ -110,6 +180,9 @@ def team_goal_analysis_page(request, team, slug, season):
         
         'team_value_list': team_value_list,
         'group_by_team_value': group_by_team_value,
+
+        'group_by_team_home_games': group_by_team_home_games,
+        'group_by_team_away_games': group_by_team_away_games,
         
         #'goals_conceded':goals_conceded
     }
