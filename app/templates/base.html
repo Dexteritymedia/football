@@ -24,9 +24,9 @@
     {% endblock meta_description %}
 	
 	
-    <meta property="og:url"           content="https://footballanalysis.pythonanywhere.com" />
+    <meta property="og:url"           content="{{ request.build_absolute_uri }}" />
     <meta property="og:type"          content="website" />
-    <meta property="og:title"         content="TheFootballAnalyst"/>
+    <meta property="og:title"         content="{{ request.META.HTTP_HOST }}"/>
     <meta property="og:description"   content="Your description" />
     <meta property="og:image"         content="{{ request.build_absolute_uri }}{% static 'images/header.jpg' %}" />
     <meta name="google-site-verification" content="dHuAYWpHwsgJMaPbyJS4FhrBU4uD1iHbm4QgEwrLYFg" />
