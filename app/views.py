@@ -20,8 +20,10 @@ from django.core import serializers
 from django.core.paginator import EmptyPage, PageNotAnInteger, Paginator
 from django.db.models import Sum, F, Count, Func, Window, Avg, Max, Min
 
+import pandas as pd
+
 from .models import *
-from .forms import AllClubForm, ClubPointForm, MatchForm, TeamGoalForm
+from .forms import *
 
 User = get_user_model()
 
@@ -52,22 +54,38 @@ def brazilian_league_team_list_page(request):
     return render(request, 'app/brazilian_league_team_list.html', context)
 
 
-def team_goal_chart(request, team):
+def team_goal_chart(request, team, season):
     labels = []
     data = []
 
+    goal_diff_labels = []
+    goal_diff_data = []
+
     queryset = ClubPoint.objects.filter(
         club__name=team,
-        #season__name=season,
+        season__name=season,
         tournament__name='Premier League',
         ).annotate(
             cumbalance=Window(Sum('goals_scored'), order_by=F('matchweek').asc())
-            ).order_by('matchweek')
+            ).order_by('matchweek').distinct()
 
-    
+
+    goal_diff = ClubPoint.objects.filter(
+        club__name=team, tournament__name='Premier League', season__name=season,).annotate(
+            gd=Sum(F('goals_scored')-F('goals_against')), order_by=F('matchweek')
+        )
+
+    """
     for entry in queryset:
         labels.append(entry.matchweek)
         data.append(entry.cumbalance)
+
+    """
+
+
+    for entry in goal_diff:
+        labels.append(entry.matchweek)
+        data.append(entry.gd)
     
     return JsonResponse(data={
         'labels': labels,
@@ -76,21 +94,39 @@ def team_goal_chart(request, team):
 
 
 def team_goal_analysis_page(request, team, slug, season):
-    team = Team.objects.get(name=team, slug=slug)
+    team = get_object_or_404(Team, name=team, slug=slug)
     #season = Season.objects.get(name=season, year=2024)
-    all_seasons = Season.objects.all().exclude(name=season).order_by('-name').distinct()
-    last_five_seasons = all_seasons[:5]
+    current_season = season
+    #print(current_season)
+    all_seasons = Season.objects.all().exclude(name=season).values_list('name', flat=True).order_by('-name').distinct()
+    #print(list(all_seasons))
+    #last_five_seasons = all_seasons[:5]
+
+    all_seasons_ = list(Season.objects.all().values_list('name', flat=True).order_by('-name').distinct())
+    print(all_seasons_)
+    selected_season = all_seasons_.index(current_season)
+    print(selected_season)
+    start_index = max(0, selected_season - 5)
+    prev_years = max(0, selected_season + 5)
+    print(start_index)
+    print(prev_years)
+    next_five_years = all_seasons_[prev_years:selected_season]
+    previous_five_years = all_seasons_[start_index:selected_season]
+    print(previous_five_years)
+    print(next_five_years)
+    
+
 
     last_five_seasons_goals = []
-    for prev_season in last_five_seasons:
+    for prev_season in previous_five_years:
         total_goals = ClubPoint.objects.filter(club__name=team, season__name=prev_season).aggregate(gs=Sum('goals_scored'), gc=Sum('goals_against'))
         last_five_seasons_goals.append(total_goals)
         
-    prev_seasons_results = zip(last_five_seasons, last_five_seasons_goals)
+    prev_seasons_results = zip(previous_five_years, last_five_seasons_goals)
     
     team_data = ClubPoint.objects.filter(club__name=team, tournament__name='Premier League', season__name=season)
     team_season = team_data.values_list('date__year', flat=True).order_by('date__year').distinct()
-    print(team_season)
+    #print(team_season)
     
     queryset = Q()
     #queryset = Q(tournament__name='Premier League')| Q(tournament__name='La Liga')
@@ -100,8 +136,16 @@ def team_goal_analysis_page(request, team, slug, season):
     total_away_goals_scored = ClubPoint.objects.filter(club__name=team, tournament__name='Premier League', ground='Away', season__name=season).aggregate(gs=Sum('goals_scored'), gc=Sum('goals_against'))
     total_clean_sheet = ClubPoint.objects.filter(club__name=team, tournament__name='Premier League', season__name=season, goals_against=0).aggregate(gc=Count('goals_against'))
     max_min_goal = ClubPoint.objects.filter(club__name=team, tournament__name='Premier League', season__name=season).aggregate(gs=Max('goals_scored'), gc=Max('goals_against'))
-
-    goal_diff = ClubPoint.objects.filter(club__name=team, tournament__name='Premier League', season__name=season,).filter(queryset).annotate(gd=Sum(F('goals_scored')+F('goals_against')))
+    average_goal = ClubPoint.objects.filter(club__name=team, tournament__name='Premier League', season__name=season).aggregate(gs=Avg('goals_scored'), gc=Avg('goals_against'))
+    print('Avg', average_goal)
+    
+    goal_diff = ClubPoint.objects.filter(
+        club__name=team, tournament__name='Premier League', season__name=season,).annotate(
+            gd=Sum(F('goals_scored')-F('goals_against')), order_by=F('matchweek')
+        )
+    total_goal_diff = goal_diff.aggregate(total=Sum('gd'))
+    #print(total_goal_diff)
+    
     cumulative_goals = ClubPoint.objects.filter(
         club__name=team,
         season__name=season,
@@ -118,20 +162,21 @@ def team_goal_analysis_page(request, team, slug, season):
         )
     ).values('matchweek', 'cumsum').order_by('matchweek', 'cumsum')
     """
+    
     value_list = ClubPoint.objects.filter(
         club__name=team,
         season__name=season,
         tournament__name="Premier League"
         ).values_list('club_against__name', flat=True).order_by('club_against').distinct()
 
-    print(value_list)
+    #print(value_list)
     group_by_value = {}
     for value in value_list:
         group_by_value[value] = team_data.filter(club_against__name=value).order_by('ground').distinct()
 
     #team_groupby = team_data.values('outcome').annotate(match_outcome=Count('outcome'))
 
-    print('Team', group_by_value)
+    #print('Team', group_by_value)
 
     team_value_list = team_data.values_list('outcome', flat=True).order_by('outcome').distinct()
 
@@ -140,7 +185,7 @@ def team_goal_analysis_page(request, team, slug, season):
         group_by_team_value[value] = team_data.filter(outcome=value)
 
     data = ClubPoint.objects.filter(Q(club__league__name='Premier League')).order_by('club').distinct()
-    print(data)
+    
 
     team_home_games = team_data.filter(ground='Home').values_list('outcome', flat=True).order_by('outcome').distinct()
 
@@ -156,14 +201,51 @@ def team_goal_analysis_page(request, team, slug, season):
         group_by_team_away_games[value] = team_data.filter(ground='Away').filter(outcome=value)
 
 
+    df = pd.DataFrame(
+        ClubPoint.objects.filter(
+        club__name=team,
+        season__name=season,
+        tournament__name="Premier League"
+        ).values_list('club_against__name','outcome','goals_scored','goals_against','matchweek','ground', 'club_against__slug').order_by('club_against'),
+
+        columns=['Opponent','Outcome','Goals Scored','Goals Against','MatchWeek','Ground', 'Slug']
+    )
+
+    print(df)
+
+    df_h = df.groupby([df['Opponent'], df['Slug']])[['Goals Against','Goals Scored']].agg(['sum'])
+    print(df_h)
+
+    print(df_h.values.tolist())
+    df_h.reset_index(inplace=True)
+
+    df_h['GA%'] = (df_h['Goals Against','sum']/df_h['Goals Against','sum'].sum()).round(3)*100
+    df_h['GS%'] = (df_h['Goals Scored','sum']/df_h['Goals Scored','sum'].sum()).round(3)*100
+    
+    print(df_h)
+    print(df_h.values.tolist())
+    print(df_h.info())
+
+    print(df[['Goals Against','Goals Scored']].describe())
+    print(df_h['Goals Scored','sum'].mean())
+    print(df_h['Goals Against','sum'].mean())
+    print(df['Goals Scored'].mean())
+    print(df['Goals Against'].mean())
+    print('Avg', average_goal)
+    print(df['Slug'].unique())
+
     context = {
+        'team_goal_analysis': df_h.values.tolist(),
+        'average_goal_scored': df['Goals Scored'].mean(),
+        'average_goal_conceded': df['Goals Against'].mean(),
         'team_data':team_data,
         'team':team,
+        'current_season': current_season,
         'season':team_season,
         'clean_sheet': total_clean_sheet,
         'max_min_goal': max_min_goal,
         'seasons': all_seasons,
-        'prev_seasons': last_five_seasons,
+        'prev_seasons': previous_five_years,
         'prev_five_seasons_goals': last_five_seasons_goals,
         'prev_seasons_results': prev_seasons_results,
         
@@ -210,6 +292,151 @@ def export_csv(request):
     return response
 
 
+class GoalDistView(View):
+    query = None
+    results = []
+    form_class = GoalDistForm
+
+    def get(self, request):
+        form = self.form_class(request.GET)
+        if form.is_valid():
+            club = form.cleaned_data.get('club', None)
+            ground = form.cleaned_data['ground']
+            date = form.cleaned_data['date']
+            tournament = form.cleaned_data['tournament']
+            print(ground)
+
+            query = Q()
+
+            query &= Q(club=club)
+
+            if tournament and tournament != "null":
+                query &= Q(tournament=tournament)
+
+            if ground and ground != "null":
+                query &= Q(ground=ground)
+
+            if date and date != "null":
+                query &= Q(date__gte=date)
+
+            df = pd.DataFrame(
+                ClubPoint.objects.filter(query).all().
+                values_list('season__name', 'club_against__name','outcome','goals_scored','goals_against','matchweek','ground').order_by('club_against'),
+                columns=['Season', 'Opponent','Outcome','Goals Scored','Goals Against','MatchWeek','Ground']
+            )
+
+            print(df)
+
+            df_h = df.groupby(df['Opponent'])[['Goals Against','Goals Scored']].agg(['sum'])
+            df_h['GA%'] = (df_h['Goals Against','sum']/df_h['Goals Against','sum'].sum()).round(3)*100
+            df_h['GS%'] = (df_h['Goals Scored','sum']/df_h['Goals Scored','sum'].sum()).round(3)*100
+
+            df_h.reset_index(inplace=True)
+            #df_h.sort_values(by=[, 'col2'], ascending=False, inplace=True)
+
+            print(df_h)
+            print(df_h.values.tolist())
+
+            context = {
+                'club': club,
+                'ground': ground,
+                'date': date,
+                'tournament': tournament,
+                'no_of_teams': df_h['Opponent'].count(),
+                'total_goals_conceded': df_h['Goals Against','sum'].sum(),
+                'total_goals_scored': df_h['Goals Scored','sum'].sum(),
+                'results': df_h.values.tolist(),
+            }
+
+            return render(request, 'app/goal_distribution_result_page.html', context)
+        else:
+            return render(request, 'app/goal_distribution_page.html', {'form':form})
+
+        return render(request, 'app/goal_distribution_page.html', {'form': form})
+
+
+class SearchGoalMatchView(View):
+    query = None
+    results = []
+    form_class = SearchGoalMatchForm
+
+    def get(self, request):
+        form = self.form_class(request.GET)
+        if form.is_valid():
+            club = form.cleaned_data.get('club', None)
+            no_of_goals = form.cleaned_data['no_of_goals']
+            goals = form.cleaned_data['goals']
+            ground = form.cleaned_data['ground']
+
+            print(goals)
+
+            query = Q()
+
+            query &= Q(club=club)
+
+            if ground and ground != "null":
+                query &= Q(ground=ground)
+
+            if goals == 'GF':
+                df = pd.DataFrame(
+                    ClubPoint.objects.filter(query).filter(tournament__name='Premier League').all().
+                    values_list('season__name', 'club_against__name','outcome','goals_scored','matchweek','ground').order_by('club_against'),
+                    columns=['Season', 'Opponent','Outcome','Goals Scored','MatchWeek','Ground']
+                )
+
+
+                df_h = df.groupby(df['Season'])['Goals Scored'].agg(['sum'])
+
+                df_matchweek = df.groupby(df['Season'])['MatchWeek'].count()
+
+                print(df_h)
+                print(df_matchweek)
+            else:
+                df = pd.DataFrame(
+                    ClubPoint.objects.filter(query).filter(tournament__name='Premier League').all().
+                    values_list('season__name', 'club_against__name','outcome','goals_against','matchweek','ground').order_by('club_against'),
+                    columns=['Season', 'Opponent','Outcome','Goals Against','MatchWeek','Ground']
+                )
+
+                print(df)
+
+                df_h = df.groupby(df['Season'])['Goals Against'].agg(['sum'])
+
+                df_matchweek = df.groupby(df['Season'])['MatchWeek'].count()
+
+                print(df_h)
+                print(df_matchweek)
+
+                dff = df.groupby("Season").apply(
+                    lambda x: x.assign(
+                        cumu=(
+                            val := 0,
+                            *(
+                                val := val + v if val < 10 else (val := 0)
+                                for v in x["Goals Against"][1:]
+                            ),
+                        )
+                    ),
+                )
+
+                print(dff)
+
+            df_h.reset_index(inplace=True)
+            
+            context = {
+                'club': club,
+                'goals': goals,
+                'results': df_h.values.tolist(),
+            }
+
+            return render(request, 'app/goal_match_result_page.html', context)
+            
+        else:
+            return render(request, 'app/goal_match_page.html', {'form':form})
+
+        return render(request, 'app/goal_match_page.html', {'form': form})
+
+
 class TeamSearchGoalView(View):
     query = None
     results = []
@@ -233,15 +460,29 @@ class TeamSearchGoalView(View):
 
                 
 
-            value_list = ClubPoint.objects.filter(club=club, goals_scored=int(no_of_goals)).filter(query).values_list('outcome', flat=True).order_by('outcome').distinct()
-            print('value', value_list)
+            #value_list = ClubPoint.objects.filter(club=club, goals_scored=int(no_of_goals)).filter(query).values_list('outcome', flat=True).order_by('outcome').distinct()
             group_by_value = {}
-            for value in value_list:
-                group_by_value[value] = ClubPoint.objects.filter(club=club, goals_scored=int(no_of_goals), outcome=value).filter(query)
+            if goals == 'GF':
+                value_list = ClubPoint.objects.filter(club=club, goals_scored=int(no_of_goals)).filter(query).values_list('outcome', flat=True).order_by('outcome').distinct()
+                for value in value_list:
+                    group_by_value[value] = ClubPoint.objects.filter(club=club, goals_scored=int(no_of_goals), outcome=value).filter(query)
+            else:
+                value_list = ClubPoint.objects.filter(club=club, goals_against=int(no_of_goals)).filter(query).values_list('outcome', flat=True).order_by('outcome').distinct()
+                for value in value_list:
+                    group_by_value[value] = ClubPoint.objects.filter(club=club, goals_against=int(no_of_goals), outcome=value).filter(query)
+            print('value', value_list)
+            """
+            if goals == 'GF':
+                for value in value_list:
+                    group_by_value[value] = ClubPoint.objects.filter(club=club, goals_scored=int(no_of_goals), outcome=value).filter(query)
+            else:
+                for value in value_list:
+                    group_by_value[value] = ClubPoint.objects.filter(club=club, goals_against=int(no_of_goals), outcome=value).filter(query)
+            """   
 
             print(group_by_value)
 
-            return render(request, 'app/team_goals_result_page.html', {'results': group_by_value, 'club':club, 'goals':no_of_goals, 'date':date})
+            return render(request, 'app/team_goals_result_page.html', {'results': group_by_value, 'club':club, 'goals':no_of_goals, 'goal_type':goals, 'date':date})
             
         else:
             return render(request, 'app/team_search_goal.html', {'form':form})

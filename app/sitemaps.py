@@ -26,6 +26,9 @@ class TeamSitemap(Sitemap):
     def items(self):
         # Assuming you have a method to fetch episodes
         #return ClubPoint.objects.all()
+        contents = ClubPoint.objects.filter(Q(club__league__name='Premier League')).values_list('club', flat=True).order_by('club').distinct()
+        print(contents)
+        print(len(ClubPoint.objects.filter(Q(club__league__name='Premier League'))))
         return ClubPoint.objects.filter(Q(club__league__name='Premier League'))
 
 
@@ -35,7 +38,7 @@ class StaticSitemap(Sitemap):
     #protocol = 'https'
 
     def items(self):
-        return ['match-search', 'team-goal-search', 'home']
+        return ['match-search', 'team-goal-search', 'home', 'dist-goal-search', 'pl-team-list-page', 'match-goal-search']
 
     def location(self, item):
         return reverse(item)

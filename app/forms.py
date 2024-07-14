@@ -68,7 +68,7 @@ OUTCOME = (
 
 
 GROUND = (
-        (None, ''),
+        (None, '---------'),
         ('Home', 'Home'),
         ('Away', 'Away'),
     )
@@ -116,5 +116,19 @@ class MatchForm(forms.Form):
 class TeamGoalForm(forms.Form): 
     club = forms.ModelChoiceField(queryset=Team.objects.filter(league__name='Premier League'))
     no_of_goals = forms.IntegerField(initial=2)
-    goals = forms.ChoiceField(choices=GOALS_TYPE, required=False, widget=forms.HiddenInput())
+    goals = forms.ChoiceField(choices=GOALS_TYPE, required=False)
+    date = forms.DateField(label="Date", required=False, widget=forms.DateInput(attrs={"class":"form-control", "type":"date", "id":"start_date"}))
+
+
+class SearchGoalMatchForm(forms.Form): 
+    club = forms.ModelChoiceField(queryset=Team.objects.filter(league__name='Premier League'))
+    no_of_goals = forms.IntegerField(initial=2)
+    goals = forms.ChoiceField(label="Type", choices=GOALS_TYPE, required=False)
+    ground = forms.ChoiceField(choices=GROUND, required=False)
+
+
+class GoalDistForm(forms.Form): 
+    club = forms.ModelChoiceField(queryset=Team.objects.filter(league__name='Premier League'))
+    ground = forms.ChoiceField(choices=GROUND, required=False)
+    tournament = forms.ModelChoiceField(required=False, queryset=Tournament.objects.all())
     date = forms.DateField(label="Date", required=False, widget=forms.DateInput(attrs={"class":"form-control", "type":"date", "id":"start_date"}))

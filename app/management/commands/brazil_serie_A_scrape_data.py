@@ -1,3 +1,4 @@
+"""
 #https://fbref.com/en/squads/abdce579/2023/Palmeiras-Stats
 https://fbref.com/en/squads/639950ae/Flamengo-Stats
 https://fbref.com/en/squads/157b7fee/Bahia-Stats
@@ -8,6 +9,7 @@ https://fbref.com/en/squads/5f232eb1/Sao-Paulo-Stats
 https://fbref.com/en/squads/f98930d1/Red-Bull-Bragantino-Stats
 https://fbref.com/en/squads/6f7e1f03/Internacional-Stats
 https://fbref.com/en/squads/422bb734/Atletico-Mineiro-Stats
+"""
 
 import os
 from pathlib import Path
@@ -32,22 +34,18 @@ seasons = ["2000", "2001", "2002", "2003", "2004", "2005",
              "2016", "2017", "2018", "2019", "2020",
              "2021", "2022", "2023", "2024"]
 
-codes = ["e297cd13", "4ba7cbea", "943e8050", "1df6b87e", "e4a775cb", "fd962109", "cd051869",
-         "cff3d9bb", "361ca564", "19538871", "822bd0ba", "b8fd03ef", "18bb7c10",
-         "b2b47a98", "d07537b9", "7c21e445", "d3fd31cc", "8602292d", "47c64c55",
-         "8cec06e1",]
+codes = ["abdce579", "639950ae", "157b7fee", "d9fdd9d9", "03ff5eeb", "2091c619", "5f232eb1",
+         "f98930d1", "6f7e1f03", "422bb734",]
 
-clubs = ["Luton-Town", "Bournemouth", "Burnley", "Sheffield-United",
-         "Nottingham-Forest", "Fulham", "Brentford",
-         "Chelsea", "Tottenham-Hotspur", "Manchester-United", "Liverpool",
-         "Manchester-City", "Arsenal", "Newcastle-United", "Brighton-and-Hove-Albion",
-         "West-Ham-United", "Everton", "Aston-Villa", "Crystal-Palace", "Wolverhampton-Wanderers",
-         ]
+clubs = ["Palmeiras", "Flamengo","Bahia","Botafogo-RJ","Cruzeiro","Athletico-Paranaense",
+         "Sao-Paulo","Red-Bull-Bragantino","Internacional","Atletico-Mineiro"]
 
-def scrape_club_history(season, code, club):
-    #club_data = f"https://fbref.com/en/squads/18bb7c10/{years}/Arsenal-Stats"
+
+
+def scrape_club_history(season):
+    
     data =[]
-    club_data = f"https://fbref.com/en/squads/{code}/{season}/{club}-Stats"
+    club_data = f"https://fbref.com/en/squads/639950ae/{season}/Flamengo-Stats"
     print(club_data)
     response = requests.get(club_data)
     print(response)
@@ -61,7 +59,7 @@ def scrape_club_history(season, code, club):
             row_rank = j.find_all("th")
             row_data = j.find_all("td")
             row = [i.text for i in row_rank + row_data]
-            data.append(row+[season])
+            data.append(row+[season]+[season]+[season])
 
     return data
     
@@ -72,20 +70,17 @@ class Command(BaseCommand):
     def handle(self, *args, **kwargs):
         root = settings.BASE_DIR
         data =[]
-        for code, club in zip(codes, clubs):
-            for season in seasons:
-                results = scrape_club_history(season, code, club)
-                print(results)
-                print("Compiling...")
-                data.append(results)
-                print("Waiting 5 seconds to start scraping again...")
-                time.sleep(5)
-            print("Saving to csv")
-            print(data)
-            data_to_list = [i for j in data for i in j]
-            df_club_history = pd.DataFrame(data_to_list)
-            stor = os.path.join(root, f"{club}.csv")
-            print(stor)
-            df_club_history.to_csv(stor)
-
-    
+        for season in seasons:
+            results = scrape_club_history(season)
+            print(results)
+            print("Compiling...")
+            data.append(results)
+            print("Waiting 5 seconds to start scraping again...")
+            time.sleep(5)
+        print("Saving to csv")
+        print(data)
+        data_to_list = [i for j in data for i in j]
+        df_club_history = pd.DataFrame(data_to_list)
+        stor = os.path.join(root, f"static/data/brazil-teams/Palmeiras-{season}.csv")
+        print(stor)
+        df_club_history.to_csv(stor)
