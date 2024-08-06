@@ -1,0 +1,126 @@
+{% extends 'anagram/base.html' %}
+
+{% load static %}
+
+{% block content %}
+<style>
+carousel-body {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin: 10px;
+    background-color: #f0f0f0;
+}
+
+
+.carousel {
+    overflow: hidden; 
+}
+
+.carousel-track {
+    display: flex;
+	gap: 100px;
+    animation: scroll 20s linear infinite;
+}
+
+
+.carousel img {
+	height: 200px;
+    margin-right: 50px;
+    border-radius: 5px;
+}
+
+
+@keyframes scroll {
+    0% {
+        transform: translateX(100%);
+    }
+    100% {
+        transform: translateX(-100%);
+    }
+}
+</style>
+
+<script>
+const track = document.querySelector('.carousel-track');
+const images = Array.from(track.children);
+
+
+const cloneImages = () => {
+    images.forEach(image => {
+        const clone = image.cloneNode(true);
+        track.appendChild(clone);
+    });
+};
+
+
+cloneImages();
+
+$(document).ready(function(){
+            setTimeout(function(){
+                $('#emailModal').modal('show');
+            }, 100);
+        });
+</script>
+
+{% if messages %}
+	{% for message in messages %}
+		<div class="alert alert-{{ message.tags }}">
+			<strong>{{ message }}</strong>
+		</div>
+	{% endfor %}
+{% endif %}
+
+<div class="text-center">
+<form method="POST">
+	{% csrf_token %}
+		<div class="row">
+			{% for field in form %}
+				{% if field.is_hidden %}
+				{% else %}
+					<div class="col-md-3 col-12 mb-3">
+						<h5 class="display-6">{{ field.label_tag }}</h5>
+						<div>{{ field }}</div>
+						{% if field.help_text %}
+							<p>{{ field.help_text }}</p>
+						{% endif %}
+					</div>
+				{% endif %}
+			{% endfor %}
+		</div>
+		<div>
+			<button type="submit" class="btn btn-outline-primary mt-3">Find</button>
+		</div>
+</form>
+</div>
+
+    <!-- Modal -->
+    <div class="modal fade" id="emailModal" tabindex="-1" aria-labelledby="emailModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="emailModalLabel">Subscribe to our newsletter</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    
+                        <button type="submit" class="btn btn-primary">Subscribe</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+<div class="carousel-body mt-5 col-12">
+<div class="carousel">
+        <div class="carousel-track">
+            <img src="{% static 'images/header.jpg' %}" class="img-fluid" alt="Image 1">
+            <img src="{% static 'images/uploads.png' %}" class="img-fluid" alt="Image 2">
+            <img src="{% static 'images/header.jpg' %}" class="img-fluid"  alt="Image 3">
+            <img src="{% static 'images/uploads.png' %}" class="img-fluid" alt="Image 4">
+            <img src="{% static 'images/header.jpg' %}" class="img-fluid" alt="Image 5">
+        </div>
+ </div>
+ </div>
+{% endblock content %}

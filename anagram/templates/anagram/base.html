@@ -4,18 +4,9 @@
 <html lang="en" data-bs-theme="dark">
 
 <head>
-    <!-- Google tag (gtag.js) -->
-<script async src="https://www.googletagmanager.com/gtag/js?id=AW-806559881"></script>
-<script>
-  window.dataLayer = window.dataLayer || [];
-  function gtag(){dataLayer.push(arguments);}
-  gtag('js', new Date());
-
-  gtag('config', 'AW-806559881');
-</script>
     <meta charset="utf-8">
 
-    <title>TheFootballAnalyst {% block title %}{% endblock title %}- {% block title_suffix %} {% endblock title_suffix %}</title>
+    <title>Anagram {% block title %}{% endblock title %}- {% block title_suffix %} {% endblock title_suffix %}</title>
 
     <meta content="width=device-width, initial-scale=1.0" name="viewport">
     {% block meta_description %}
@@ -32,7 +23,6 @@
     <meta property="og:description"   content="" />
 	{% endblock facebook_meta %}
     <meta property="og:image"         content="{{ request.build_absolute_uri }}{% static 'images/header.jpg' %}" />
-    <meta name="google-site-verification" content="dHuAYWpHwsgJMaPbyJS4FhrBU4uD1iHbm4QgEwrLYFg" />
 	{% block meta_desc %}{% endblock meta_desc %}
 
     <!-- Favicon -->
@@ -91,16 +81,6 @@
 		{% endblock css %}
 	</style>
 	
-	<!-- Ads -->
-	{% block add_script %}
-	<!-- Adsterra -->
-	<script type='text/javascript' src='//pl23391657.highcpmgate.com/41/45/9e/41459ec5448c0c02e36ad59fb07911f2.js'></script>
-	{% endblock add_script %}
-	
-	<meta name="monetag" content="502c869fbf32d4f921363e7d582a829e">
-	
-	<script src="https://alwingulla.com/88/tag.min.js" data-zone="69369" async data-cfasync="false"></script>
-	
 </head>
 <body>
 <div id=”divInstallApp”></div>
@@ -112,11 +92,6 @@
 
 			{% block content %}
 			{% endblock content %}
-
-			<script async="async" data-cfasync="false" src="//pl23383023.highcpmgate.com/9eb8cc7d386b25d3577662a96f56de78/invoke.js"></script>
-			<div id="container-9eb8cc7d386b25d3577662a96f56de78"></div>
-
-			<script type='text/javascript' src='//pl23399228.highcpmgate.com/81/df/c4/81dfc490ed55eb24f13bd9db8b617710.js'></script>
 
 			{% block footer %}
 			{% endblock footer %}

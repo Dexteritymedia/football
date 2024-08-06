@@ -55,6 +55,7 @@ list_sitemaps = {
 urlpatterns = [
     path(f'{ADMIN_URL}/', admin.site.urls),
     path('', include('app.urls')),
+    path('words-building/', include('anagram.urls')),
 
     path(
         "sports-sitemap.xml/",

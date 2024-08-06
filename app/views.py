@@ -41,7 +41,8 @@ def payment_page(request):
 
 def team_list_page(request):
     #teams = Team.objects.all()
-    teams = Team.objects.filter(Q(league__name='Premier League')| Q(league__name='La Liga')| Q(league__name='Bundesliga'))
+    teams = Team.objects.filter(Q(league__name='Premier League'))
+    #teams = Team.objects.filter(Q(league__name='Premier League')| Q(league__name='La Liga')| Q(league__name='Bundesliga'))
     latest_season = Season.objects.last()
     context = {'teams': teams, 'season':latest_season}
     return render(request, 'app/team_list.html', context)
@@ -62,7 +63,7 @@ def team_goal_chart(request, team, season):
     goal_diff_data = []
 
     queryset = ClubPoint.objects.filter(
-        club__name=team,
+        club__name=team.title(),
         season__name=season,
         tournament__name='Premier League',
         ).annotate(
@@ -71,9 +72,12 @@ def team_goal_chart(request, team, season):
 
 
     goal_diff = ClubPoint.objects.filter(
-        club__name=team, tournament__name='Premier League', season__name=season,).annotate(
+        club__name=team.title(), tournament__name='Premier League', season__name=season,).annotate(
             gd=Sum(F('goals_scored')-F('goals_against')), order_by=F('matchweek')
         )
+    
+
+    print(goal_diff)
 
     """
     for entry in queryset:
@@ -86,10 +90,24 @@ def team_goal_chart(request, team, season):
     for entry in goal_diff:
         labels.append(entry.matchweek)
         data.append(entry.gd)
+
     
-    return JsonResponse(data={
+    dat={
         'labels': labels,
         'data': data,
+    }
+
+    combined = list(zip(dat['labels'], dat['data']))
+    sorted_combined = sorted(combined, key=lambda item: item[0], reverse=True)
+    sorted_labels, sorted_data = zip(*sorted_combined)
+    sorted_dict = {"labels": list(sorted_labels), "data": list(sorted_data)}
+    print(sorted_dict)
+    
+    print('LABELS', labels, 'DATA', data)
+    
+    return JsonResponse(data={
+        'labels': list(sorted_labels),
+        'data': list(sorted_data),
     })
 
 
@@ -107,10 +125,10 @@ def team_goal_analysis_page(request, team, slug, season):
     selected_season = all_seasons_.index(current_season)
     print(selected_season)
     start_index = max(0, selected_season - 5)
-    prev_years = max(0, selected_season + 5)
+    end_index = min(len(all_seasons_), selected_season + 6)
     print(start_index)
-    print(prev_years)
-    next_five_years = all_seasons_[prev_years:selected_season]
+    print(end_index)
+    next_five_years = all_seasons_[selected_season + 1:end_index]
     previous_five_years = all_seasons_[start_index:selected_season]
     print(previous_five_years)
     print(next_five_years)
@@ -119,10 +137,18 @@ def team_goal_analysis_page(request, team, slug, season):
 
     last_five_seasons_goals = []
     for prev_season in previous_five_years:
-        total_goals = ClubPoint.objects.filter(club__name=team, season__name=prev_season).aggregate(gs=Sum('goals_scored'), gc=Sum('goals_against'))
+        total_goals = ClubPoint.objects.filter(club__name=team, tournament__name='Premier League', season__name=prev_season).aggregate(gs=Sum('goals_scored'), gc=Sum('goals_against'))
         last_five_seasons_goals.append(total_goals)
         
     prev_seasons_results = zip(previous_five_years, last_five_seasons_goals)
+
+
+    next_five_seasons_goals = []
+    for next_season in next_five_years:
+        total_goals = ClubPoint.objects.filter(club__name=team, tournament__name='Premier League', season__name=next_season).aggregate(gs=Sum('goals_scored'), gc=Sum('goals_against'))
+        next_five_seasons_goals.append(total_goals)
+        
+    next_seasons_results = zip(next_five_years, next_five_seasons_goals)
     
     team_data = ClubPoint.objects.filter(club__name=team, tournament__name='Premier League', season__name=season)
     team_season = team_data.values_list('date__year', flat=True).order_by('date__year').distinct()
@@ -248,6 +274,7 @@ def team_goal_analysis_page(request, team, slug, season):
         'prev_seasons': previous_five_years,
         'prev_five_seasons_goals': last_five_seasons_goals,
         'prev_seasons_results': prev_seasons_results,
+        'next_five_years': next_seasons_results,
         
         'goals_scored':total_goals_scored,
         'home_goals_scored': total_home_goals_scored,
@@ -330,6 +357,7 @@ class GoalDistView(View):
             df_h = df.groupby(df['Opponent'])[['Goals Against','Goals Scored']].agg(['sum'])
             df_h['GA%'] = (df_h['Goals Against','sum']/df_h['Goals Against','sum'].sum()).round(3)*100
             df_h['GS%'] = (df_h['Goals Scored','sum']/df_h['Goals Scored','sum'].sum()).round(3)*100
+            df_h['GD'] = (df_h['Goals Scored','sum'] - df_h['Goals Against','sum'])
 
             df_h.reset_index(inplace=True)
             #df_h.sort_values(by=[, 'col2'], ascending=False, inplace=True)
@@ -384,6 +412,7 @@ class SearchGoalMatchView(View):
                     columns=['Season', 'Opponent','Outcome','Goals Scored','MatchWeek','Ground']
                 )
 
+                df.sort_values(['Season','MatchWeek'], ascending=True, inplace=True)
 
                 df_h = df.groupby(df['Season'])['Goals Scored'].agg(['sum'])
 
@@ -391,13 +420,25 @@ class SearchGoalMatchView(View):
 
                 print(df_h)
                 print(df_matchweek)
+
+                dff = df.groupby("Season").apply(
+                    lambda x: x.assign(
+                        cumu=(
+                            val := 0,
+                            *(
+                                val := val + v if val < int(no_of_goals) else (val := 0)
+                                for v in x["Goals Scored"][1:]
+                            ),
+                        )
+                    ),
+                )
             else:
                 df = pd.DataFrame(
                     ClubPoint.objects.filter(query).filter(tournament__name='Premier League').all().
                     values_list('season__name', 'club_against__name','outcome','goals_against','matchweek','ground').order_by('club_against'),
                     columns=['Season', 'Opponent','Outcome','Goals Against','MatchWeek','Ground']
                 )
-
+                df.sort_values(['Season','MatchWeek'], ascending=True, inplace=True)
                 print(df)
 
                 df_h = df.groupby(df['Season'])['Goals Against'].agg(['sum'])
@@ -412,21 +453,33 @@ class SearchGoalMatchView(View):
                         cumu=(
                             val := 0,
                             *(
-                                val := val + v if val < 10 else (val := 0)
+                                val := val + v if val < int(no_of_goals) else (val := 0)
                                 for v in x["Goals Against"][1:]
                             ),
                         )
                     ),
                 )
 
-                print(dff)
+                
+            print(dff)
+            df_k = dff.groupby([dff['cumu'] == int(no_of_goals), dff['Season']])
+            results = pd.DataFrame(df_k.size().reset_index(name = "Group_Count"))
+            print(results)
+            data = results.loc[(results['cumu'] == True )]
+            
+            #dff = dff.groupby(dff['Season'])['cumu'].sum()
+            #print(dff)
+            #df.groupby([(df['Date'].dt.year)])[' Close'].agg(['first','last','count'])
 
             df_h.reset_index(inplace=True)
             
             context = {
                 'club': club,
                 'goals': goals,
-                'results': df_h.values.tolist(),
+                'no_of_goals': no_of_goals,
+                'ground': ground,
+                'table': data.values.tolist(),
+                'results': dff.values.tolist(),
             }
 
             return render(request, 'app/goal_match_result_page.html', context)

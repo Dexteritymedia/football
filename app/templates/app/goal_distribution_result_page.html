@@ -41,18 +41,20 @@ data-layout="button_count" class="facebook"><i class='fab fa-facebook-f' style="
 					<th scope="col">Goals Conceded</th>
 					<th scope="col">Goals Scored</th>
 					<th scope="col">Percentage contribution to total goals conceded</th>
-					<th scope="col">Percentage contribution to total goals Scored</th>
+					<th scope="col">Percentage contribution to total goals scored</th>
+					<th scope="col">Goal Difference</th>
 				</tr>
 			</thead>
 				{% for result in results %}
 				<tbody>
 					<tr class="">
-					<td><a href="">{{result.0}}</a></td>
+					<td><a>{{result.0}}</a></td>
 					<td>{{result.1}}</td>
 					<td>{{result.2}}</td>
 					<td>{{result.3}}</td>
 					<td>{{result.4}}</td>
 					<td>{{result.5}}</td>
+					<td>{{result.6}}</td>
 					</tr>
 				</tbody>
 				{% endfor %}

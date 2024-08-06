@@ -86,11 +86,10 @@
 
 </div>
 
+{% if next_five_years %}
+<h3 class="mt-5 text-center">{{team.name}} Previous Goal Stats</h3>
 
-{% if prev_seasons_results %}
-<h3 class="mt-5 text-center">{{team.name}} Historical Goal Stats</h3>
-
-{% for seasons in prev_seasons_results %}
+{% for seasons in next_five_years %}
 <div class="row text-center">
 	<div class="col-4">
 		{{seasons.0}}
@@ -127,7 +126,7 @@
 	{% for key, values in group_by_team_value.items %}
   <div class="accordion-item">
     <h2 class="accordion-header">
-      <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#flush-collapseOne" aria-expanded="false" aria-controls="flush-collapseOne">
+      <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#flush-collapseOne{{key}}" aria-expanded="false" aria-controls="flush-collapseOne">
         {% if key == 'L' %}
 			<h1>{{values|length}} Loses </h1>
 		{% elif key == 'W' %}
@@ -139,7 +138,7 @@
 		{% endif %}
       </button>
     </h2>
-    <div id="flush-collapseOne" class="accordion-collapse collapse" data-bs-parent="#accordionFlushExample">
+    <div id="flush-collapseOne{{key}}" class="accordion-collapse collapse" data-bs-parent="#accordionFlushExample">
 	  <div class="table-responsive mt-3">
 		<table class="table table-striped table-hover">
 			<thead>
@@ -180,11 +179,11 @@
 
 <div class="mt-3">
 	<h2 class="text-center">{{team.name}} Home Match Performance Analysis</h2>
-	<div class="accordion accordion-flush" id="accordionFlushExample">
+	<div class="accordion accordion-flush" id="accordionFlushExampleHome">
 	{% for key, values in group_by_team_home_games.items %}
   <div class="accordion-item">
     <h2 class="accordion-header">
-      <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#flush-collapseOne" aria-expanded="false" aria-controls="flush-collapseOne">
+      <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#flush-collapse{{key}}" aria-expanded="false" aria-controls="flush-collapse{{key}}">
         {% if key == 'L' %}
 			<h1>{{values|length}} Loses </h1>
 		{% elif key == 'W' %}
@@ -196,7 +195,7 @@
 		{% endif %}
       </button>
     </h2>
-    <div id="flush-collapseOne" class="accordion-collapse collapse" data-bs-parent="#accordionFlushExample">
+    <div id="flush-collapse{{key}}" class="accordion-collapse collapse" data-bs-parent="#accordionFlushExampleHome">
 	  <div class="table-responsive mt-3">
 		<table class="table table-striped table-hover">
 			<thead>
@@ -236,11 +235,11 @@
 
 <div class="mt-3">
 	<h2 class="text-center">{{team.name}} Away Match Performance Analysis</h2>
-	<div class="accordion accordion-flush" id="accordionFlushExample">
+	<div class="accordion accordion-flush" id="accordionFlushExampleAway">
 	{% for key, values in group_by_team_away_games.items %}
   <div class="accordion-item">
     <h2 class="accordion-header">
-      <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#flush-collapseOne" aria-expanded="false" aria-controls="flush-collapseOne">
+      <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#flush-collapseAway{{key}}" aria-expanded="false" aria-controls="flush-collapseOne">
         {% if key == 'L' %}
 			<h1>{{values|length}} Loses </h1>
 		{% elif key == 'W' %}
@@ -252,7 +251,7 @@
 		{% endif %}
       </button>
     </h2>
-    <div id="flush-collapseOne" class="accordion-collapse collapse" data-bs-parent="#accordionFlushExample">
+    <div id="flush-collapseAway{{key}}" class="accordion-collapse collapse" data-bs-parent="#accordionFlushExampleAway">
 	  <div class="table-responsive mt-3">
 		<table class="table table-striped table-hover">
 			<thead>
@@ -288,72 +287,7 @@
 {% endif %}
 
 
-<div class="table-responsive" id="container">
-    <canvas class="text-center" style="height: 400px;" class="table" id="goal-chart" data-url="{% url 'goal-chart' team.name current_season %}"></canvas>
- </div>
-
-  <script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/chart.js@2.9.3/dist/Chart.min.js"></script>
-  <script>
-
-    $(function () {
-
-      var $populationChart = $("#goal-chart");
-      $.ajax({
-        url: $populationChart.data("url"),
-        success: function (data) {
-
-          var ctx = $populationChart[0].getContext("2d");
-
-          new Chart(ctx, {
-            type: 'bar',
-            data: {
-              labels: data.labels,
-              datasets: [{
-                label: 'Goals',
-                backgroundColor: 'blue',
-                data: data.data
-              }]          
-            },
-            options: {
-              responsive: false,
-              legend: {
-                position: 'top',
-              },
-              title: {
-                display: true,
-				color: 'white',
-				fullSize: true,
-                text: '{{team.name}} Premier League Cumulative Goals Scored in Bar Chart',
-				font: {
-					size: 45,
-					weight: 'normal',
-				}
-              },
-			  scales: {
-				y: {
-					title: {
-						display: true,
-						text: 'Goals',
-					}
-				},
-				x: {
-					title: {
-						display: true,
-						text: 'MatchWeek',
-					}
-				}
-            }
-          });
-
-        }
-      });
-
-    });
-
-  </script>
-  
-  
+<canvas id="goal-chart" height="500" data-url="{% url 'goal-chart' team.name current_season %}"></canvas> 
   
 {% comment %}
 {% for gd in goal_diff %}
@@ -397,6 +331,95 @@
 
 {% endcomment %}
 
-<script src="https://cdn.jsdelivr.net/npm/chart.js@2.8.0"></script> 
 
+{% block js %}
+<script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+
+$(function () {
+
+      var $populationChart = $("#goal-chart")
+      $.ajax({
+        url: $populationChart.data("url"),
+        success: function (data) {
+
+          var ctx = $populationChart[0].getContext("2d");
+
+          new Chart(ctx, {
+            type: 'bar',
+            data: {
+              labels: data.labels,
+              datasets: [{
+                label: 'Goals',
+                //backgroundColor: 'blue',
+				backgroundColor: "#79AEC8",
+				borderColor: "rgba(255, 99, 132, 0.2)",
+                data: data.data,
+				borderWidth: 1,
+              }]          
+            },
+            options: {
+				scales: {
+					x: {
+						ticks: {
+							color: 'white',
+						},
+						title: {
+							display: true,
+							color: 'white',
+							text: 'MatchWeek' // Name of x-axis
+						},
+					},
+					y: {
+						ticks: {
+							color: 'white',
+						},
+						title: {
+							display: true,
+							color: 'white',
+							text: 'Goals Difference' // Name of x-axis
+						},
+					},
+				},
+				plugins: {
+					title: {
+						display: true,
+						text: '{{team.name}} Premier League Cumulative Goals Scored in Bar Chart',
+						color: 'white',
+						padding: {
+							//top: 10,
+							//bottom: 30
+						},
+						font: {
+							size: 20,
+						},
+					},
+					subtitle: {
+						//display: true,
+						//text: '{{team.name}} Premier League Cumulative Goals Scored in Bar Chart'
+					},
+					legend: {
+						labels: {
+							// This more specific font property overrides the global property
+							font: {
+								size: 20,
+								weight: 'bolder',
+								color: 'white',
+							}
+						}
+					}
+				},
+    
+            }
+          });
+
+        }
+      });
+
+    });
+	
+</script>
+{% endblock js %}
+	
 {% endblock content %}

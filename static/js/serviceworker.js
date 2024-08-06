@@ -1,9 +1,10 @@
 var staticCacheName = "thefootballanalyst-pwa-a" + new Date().getTime();
 var filesToCache = [
-    '/',
-    '/offline',
-    '/path/to/css',
-    '/path/to/images',
+    //'/',
+    'app/templates/offline',
+    '/static/css',
+    '/static/images',
+    //'/path/to/images',
 ];
 
 // Cache on install
@@ -43,3 +44,6 @@ self.addEventListener("fetch", event => {
             })
     )
 });
+
+self.addEventListener('install', () => self.skipWaiting());
+self.addEventListener('activate', () => self.clients.claim());

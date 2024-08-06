@@ -42,6 +42,7 @@ INSTALLED_APPS = [
     'project',
     'app',
     'core',
+    'anagram',
 
     'wagtailmenus',
 
@@ -190,6 +191,9 @@ AUTH_USER_MODEL = 'core.CustomUser'
 WAGTAIL_SITE_NAME = 'Football Project'
 
 WAGTAILADMIN_BASE_URL = env('BLOG_ADMIN_URL')
+
+
+OPENAI_API_KEY = env('OPENAI_API_KEY')
 
 # Replace the search backend
 #WAGTAILSEARCH_BACKENDS = {

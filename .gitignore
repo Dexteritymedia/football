@@ -26,6 +26,7 @@ wheels/
 
 data
 sent_mails
+node_modules
 media
 campaign
 db.sqlite3

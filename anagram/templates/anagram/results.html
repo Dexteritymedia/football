@@ -1,0 +1,22 @@
+{% extends 'anagram/base.html' %}
+
+
+{% block content %}
+
+<div class="container">
+<div class="mt-3">
+	<h1 class="text-center">All Words Found</h1>
+	<div class="accordion accordion-flush" id="accordionFlushExample">
+	{% for content in results %}
+  <div class="accordion-item mt-3">
+    <h2 class="accordion-header">
+        {{content}}
+    </h2>
+    </div>
+  {% endfor %}
+</div>
+
+<a href="{% url 'anagram:home' %}" class="text-center btn btn-outline-primary mt-3 mb-3">Go back</a>
+</div>
+</div>
+{% endblock content %}

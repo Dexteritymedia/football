@@ -28,7 +28,7 @@ data-layout="button_count" class="facebook"><i class='fab fa-facebook-f' style="
 <div class="col-9"></div>
 
 <div class="text-center mt-5">
-
+<h3>{{club}}'s {% if goals == 'GF' %} {% else %} {% endif %} {{no_of_goals}} {{ground}} </h3>
 </div>
 
 <div class="table-responsive mt-3">
@@ -37,23 +37,27 @@ data-layout="button_count" class="facebook"><i class='fab fa-facebook-f' style="
 				<tr>
 					<th scope="col">Season</th>
 					{% if goals == 'GF' %}
-					<th scope="col">Goals Scored</th>
+					<th scope="col"> Number of matches to scored</th>
 					{% else %}
-					<th scope="col">Goals Conceded</th>
+					<th scope="col">Number of matches to concede</th>
 					{% endif %}
 					
 				</tr>
 			</thead>
-				{% for result in results %}
+				{% for result in table %}
 				<tbody>
 					<tr class="">
-					<td>{{result.0}}</td>
 					<td>{{result.1}}</td>
+					<td>{{result.2}}</td>
 					</tr>
 				</tbody>
 				{% endfor %}
 		</table>
 	</div>
+	
+{{results}}
+	
+	
 
 {% else %}
 	<h1 class="mt-5">No results for your search</h1>

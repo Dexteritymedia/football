@@ -45,7 +45,7 @@ clubs = ["Palmeiras", "Flamengo","Bahia","Botafogo-RJ","Cruzeiro","Athletico-Par
 def scrape_club_history(season):
     
     data =[]
-    club_data = f"https://fbref.com/en/squads/639950ae/{season}/Flamengo-Stats"
+    club_data = f"https://fbref.com/en/squads/03ff5eeb/{season}/Cruzeiro-Stats"
     print(club_data)
     response = requests.get(club_data)
     print(response)
@@ -81,6 +81,6 @@ class Command(BaseCommand):
         print(data)
         data_to_list = [i for j in data for i in j]
         df_club_history = pd.DataFrame(data_to_list)
-        stor = os.path.join(root, f"static/data/brazil-teams/Palmeiras-{season}.csv")
+        stor = os.path.join(root, f"static/data/brazil-teams/Cruzeiro-{season}.csv")
         print(stor)
         df_club_history.to_csv(stor)
