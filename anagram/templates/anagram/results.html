@@ -6,6 +6,34 @@
 <div class="container">
 <div class="mt-3">
 	<h1 class="text-center">All Words Found</h1>
+	<h4 class="text-center">Click the words with arrow to find its meaning(s)</h4>
+	
+	
+	<div class="accordion accordion-flush" id="accordionFlushExampleAway">
+	{% for key, values in results.items %}
+	
+  <div class="accordion-item mt-3">
+  {% if values %}
+    <h2 class="accordion-header">
+      <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#flush-collapseAway{{key}}" aria-expanded="false" aria-controls="flush-collapseOne">
+       <h2>{{key}}</h2>
+      </button>
+    </h2>
+    <div id="flush-collapseAway{{key}}" class="accordion-collapse collapse" data-bs-parent="#accordionFlushExampleAway">
+	  <div class="m-5">
+	  {% for value in values %}
+		<li>{{value}}</li>
+	{% endfor %}
+  </div>
+  </div>
+  {% else %}
+       <h2 class="accordion-header p-4">{{key}}</h2>
+  {% endif %}
+  {% endfor %}
+</div>
+</div>
+
+{% comment %}
 	<div class="accordion accordion-flush" id="accordionFlushExample">
 	{% for content in results %}
   <div class="accordion-item mt-3">
@@ -15,6 +43,7 @@
     </div>
   {% endfor %}
 </div>
+{% endcomment %}
 
 <a href="{% url 'anagram:home' %}" class="text-center btn btn-outline-primary mt-3 mb-3">Go back</a>
 </div>

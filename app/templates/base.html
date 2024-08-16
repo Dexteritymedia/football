@@ -92,14 +92,16 @@
 	</style>
 	
 	<!-- Ads -->
-	{% block add_script %}
+	{% block ads_script %}
 	<!-- Adsterra -->
 	<script type='text/javascript' src='//pl23391657.highcpmgate.com/41/45/9e/41459ec5448c0c02e36ad59fb07911f2.js'></script>
-	{% endblock add_script %}
+	{% endblock ads_script %}
 	
+	{% block ads %}
 	<meta name="monetag" content="502c869fbf32d4f921363e7d582a829e">
 	
 	<script src="https://alwingulla.com/88/tag.min.js" data-zone="69369" async data-cfasync="false"></script>
+	{% endblock ads %}
 	
 </head>
 <body>
@@ -113,10 +115,12 @@
 			{% block content %}
 			{% endblock content %}
 
+			{% block ads_ %}
 			<script async="async" data-cfasync="false" src="//pl23383023.highcpmgate.com/9eb8cc7d386b25d3577662a96f56de78/invoke.js"></script>
 			<div id="container-9eb8cc7d386b25d3577662a96f56de78"></div>
 
 			<script type='text/javascript' src='//pl23399228.highcpmgate.com/81/df/c4/81dfc490ed55eb24f13bd9db8b617710.js'></script>
+			{% endblock ads_ %}
 
 			{% block footer %}
 			{% endblock footer %}

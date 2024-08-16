@@ -45,7 +45,8 @@ def generate_three_five_lettered_words(letters):
 def generate_words(letters, length):
     import nltk
     #nltk.download('words')
-    from nltk.corpus import words
+    nltk.download('wordnet')
+    from nltk.corpus import words, wordnet
     
     valid_words = set(words.words())
     possible_words = set()
@@ -56,7 +57,13 @@ def generate_words(letters, length):
     #print(possible_words)
     results = [word for word in possible_words if word in valid_words]
     #print(results)
-    return results
+    
+    meanings = {word: wordnet.synsets(word) for word in results}
+    formatted_meanings = {word: [synset.definition() for synset in synsets] for word, synsets in meanings.items()}
+    #print(meanings)
+    print(formatted_meanings)
+                          
+    return formatted_meanings
 
 
 def home(request):
@@ -64,7 +71,7 @@ def home(request):
         form = WordsForm(request.POST)
         if form.is_valid():
             #input_text = form.cleaned_data['letters']
-            no_of_words = form.cleaned_data['no_of_words']
+            no_of_words = form.cleaned_data['no_of_letters']
             letter_list = form.cleaned_data['letter_list']
 
             print(no_of_words, letter_list)

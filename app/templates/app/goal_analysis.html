@@ -356,7 +356,8 @@ $(function () {
 				backgroundColor: "#79AEC8",
 				borderColor: "rgba(255, 99, 132, 0.2)",
                 data: data.data,
-				borderWidth: 1,
+				//borderWidth: 2,
+                fill: 'start'
               }]          
             },
             options: {
@@ -385,7 +386,7 @@ $(function () {
 				plugins: {
 					title: {
 						display: true,
-						text: '{{team.name}} Premier League Cumulative Goals Scored in Bar Chart',
+						text: "{{team.name}}'s {{current_season }} Premier League Goals Difference Scored in Bar Chart",
 						color: 'white',
 						padding: {
 							//top: 10,

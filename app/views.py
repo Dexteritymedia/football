@@ -77,7 +77,7 @@ def team_goal_chart(request, team, season):
         )
     
 
-    print(goal_diff)
+    #print(goal_diff)
 
     """
     for entry in queryset:
@@ -86,29 +86,31 @@ def team_goal_chart(request, team, season):
 
     """
 
+    try:
+        for entry in goal_diff:
+            labels.append(entry.matchweek)
+            data.append(entry.gd)
 
-    for entry in goal_diff:
-        labels.append(entry.matchweek)
-        data.append(entry.gd)
+        
+        dat={
+            'labels': labels,
+            'data': data,
+        }
 
-    
-    dat={
-        'labels': labels,
-        'data': data,
-    }
-
-    combined = list(zip(dat['labels'], dat['data']))
-    sorted_combined = sorted(combined, key=lambda item: item[0], reverse=True)
-    sorted_labels, sorted_data = zip(*sorted_combined)
-    sorted_dict = {"labels": list(sorted_labels), "data": list(sorted_data)}
-    print(sorted_dict)
-    
-    print('LABELS', labels, 'DATA', data)
-    
-    return JsonResponse(data={
-        'labels': list(sorted_labels),
-        'data': list(sorted_data),
-    })
+        combined = list(zip(dat['labels'], dat['data']))
+        sorted_combined = sorted(combined, key=lambda item: item[0], reverse=True)
+        sorted_labels, sorted_data = zip(*sorted_combined)
+        sorted_dict = {"labels": list(sorted_labels), "data": list(sorted_data)}
+        print(sorted_dict)
+        
+        print('LABELS', labels, 'DATA', data)
+        
+        return JsonResponse(data={
+            'labels': list(sorted_labels),
+            'data': list(sorted_data),
+        })
+    except:
+        return JsonResponse(data={})
 
 
 def team_goal_analysis_page(request, team, slug, season):
