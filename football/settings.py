@@ -44,6 +44,9 @@ INSTALLED_APPS = [
     'core',
     'anagram',
 
+    "allauth",
+    "allauth.account",
+
     'wagtailmenus',
 
     'wagtail_modeladmin',
@@ -82,6 +85,13 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 
     'wagtail.contrib.redirects.middleware.RedirectMiddleware',
+    'allauth.account.middleware.AccountMiddleware',
+]
+
+AUTHENTICATION_BACKENDS = [
+
+    'django.contrib.auth.backends.ModelBackend',
+    'allauth.account.auth_backends.AuthenticationBackend',
 ]
 
 ROOT_URLCONF = 'football.urls'
@@ -229,6 +239,25 @@ WHITENOISE_MANIFEST_STRICT = False
 WHITENOISE_ALLOW_ALL_ORIGINS = True
 
 SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+
+#django-allauth registraion settings
+
+ACCOUNT_EMAIL_CONFIRMATION_EXPIRE_DAYS = 1
+ACCOUNT_EMAIL_REQUIRED = True
+#ACCOUNT_EMAIL_VERIFICATION = "mandatory"
+ACCOUNT_EMAIL_VERIFICATION = "optional"
+ACCOUNT_LOGIN_ATTEMPTS_LIMIT = 5
+ACCOUNT_EMAIL_NOTIFICATIONS = True
+ACCOUNT_AUTHENTICATION_METHOD = 'username_email'
+ACCOUNT_LOGOUT_REDIRECT_URL = 'home' 
+  
+# redirects to profile page if not configured. 
+LOGIN_REDIRECT_URL = 'home'
+
+SITE_ID =1
+
+EMAIL_BACKEND = 'django.core.mail.backends.filebased.EmailBackend'
+EMAIL_FILE_PATH = os.path.join(BASE_DIR, 'sent_mails')
 
 """Configuration of django-storages
 

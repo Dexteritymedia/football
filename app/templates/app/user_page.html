@@ -1,0 +1,28 @@
+{% extends 'app/base.html' %}
+
+
+{% block ads_script %}
+{% endblock ads_script %}
+{% block ads %}
+{% endblock ads %}
+{% block ads_ %}
+{% endblock ads_ %}
+
+
+{% block content %}
+<div class="row mt-5">
+<h1 class="text-center">Your Saved Analyses</h1>
+<div class="col-4">
+	{{user.username|title}}
+	{{user.user_credits}}
+	<a href="">make payment</a>
+</div>
+<div class="col-8">
+	{% for content in contents %}
+		URL: {{content}}
+		<p>URL: <a href="">{{content.url}}</a></p>
+		<p>Date Viewed: {{content.created_at}}</p>
+	{% endfor %}
+</div>
+</div>
+{% endblock content %}

@@ -11,5 +11,5 @@ NUMBER_OF_WORDS = (
 
 class WordsForm(forms.Form):
     #letters = forms.CharField(help_text='Input letters (separate with commas): e.g "b,e,a,r,m"', widget=forms.HiddenInput())
-    letter_list = CommaSeparatedField(help_text='Input letters (separate with commas): e.g "b,e,a,r,m"', label='Letters')
-    no_of_letters = forms.ChoiceField(choices=NUMBER_OF_WORDS, widget=forms.RadioSelect(attrs={"id":"no-of-words"}))
+    letter_list = CommaSeparatedField(help_text='Input letters (separate with commas): e.g "b,e,a,r,m"', label='Letters', widget=forms.TextInput(attrs={"class":"form-control"}))
+    number_of_letters = forms.ChoiceField(choices=NUMBER_OF_WORDS, widget=forms.RadioSelect(attrs={"id":"no-of-words"}))

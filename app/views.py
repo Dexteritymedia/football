@@ -19,6 +19,7 @@ from django.db.models import Q
 from django.core import serializers
 from django.core.paginator import EmptyPage, PageNotAnInteger, Paginator
 from django.db.models import Sum, F, Count, Func, Window, Avg, Max, Min
+from django.urls import reverse
 
 import pandas as pd
 
@@ -32,6 +33,16 @@ User = get_user_model()
 def home(request):
     context = {}
     return render(request, 'app/index.html', context)
+
+
+@login_required(login_url="login")
+def user_profile(request, username):
+    user = get_object_or_404(User, username=username)
+    print(user)
+    if user != request.user:
+        return HttpResponseForbidden()
+    saved_urls = SavedUrl.objects.filter(user=user).order_by('-created_at')
+    return render(request, 'app/user_page.html', {'user':user, 'contents':saved_urls})
 
 
 def payment_page(request):
@@ -328,6 +339,8 @@ class GoalDistView(View):
 
     def get(self, request):
         form = self.form_class(request.GET)
+        save_url = SavedUrlForm(url=request.build_absolute_uri())
+        print(save_url)
         if form.is_valid():
             club = form.cleaned_data.get('club', None)
             ground = form.cleaned_data['ground']
@@ -347,6 +360,30 @@ class GoalDistView(View):
 
             if date and date != "null":
                 query &= Q(date__gte=date)
+
+            print('Username:', request.user.username)
+            try:
+                user = User.objects.get(username=request.user.username)
+                
+                #user.user_credits = 100
+                #user.save()
+                
+                if user.user_credits <= 0:
+                    payment_url = reverse('payment-page')
+                    messages.warning(request, mark_safe(
+                        f'You are out of credit today! Please come back tomorrow to receive free 10 credits or you can get unlimited credits by making a payment <a href="{payment_url}" target="_blank">here</a>'
+                    ))
+                    return redirect('dist-goal-search')
+                else:
+                    user.user_credits -= 1
+                    user.save()
+            except User.DoesNotExist:
+                login_url = reverse('account_login')
+                messages.warning(request, mark_safe(
+                    f'You need to <a href="{login_url}">login</a> to use this!'
+                ))
+                return redirect('dist-goal-search')
+    
 
             df = pd.DataFrame(
                 ClubPoint.objects.filter(query).all().
@@ -376,6 +413,7 @@ class GoalDistView(View):
                 'total_goals_conceded': df_h['Goals Against','sum'].sum(),
                 'total_goals_scored': df_h['Goals Scored','sum'].sum(),
                 'results': df_h.values.tolist(),
+                'save_url': save_url,
             }
 
             return render(request, 'app/goal_distribution_result_page.html', context)
@@ -384,6 +422,20 @@ class GoalDistView(View):
 
         return render(request, 'app/goal_distribution_page.html', {'form': form})
 
+    def post(self, request):
+        save_url_form = SavedUrlForm(request.POST)
+        print(save_url_form)
+        if save_url_form.is_valid():
+            saved_url = save_url_form.save(commit=False)
+            print(saved_url)
+            saved_url.user = request.user
+            saved_url.save()
+            #return redirect('user_profile', saved_url.user.username)
+            messages.info(request, mark_safe(
+                'You have successfully saved this!'
+            ))
+            return HttpResponseRedirect(request.get_full_path())
+        return self.get(request)
 
 class SearchGoalMatchView(View):
     query = None
@@ -474,6 +526,8 @@ class SearchGoalMatchView(View):
             #df.groupby([(df['Date'].dt.year)])[' Close'].agg(['first','last','count'])
 
             df_h.reset_index(inplace=True)
+
+    
             
             context = {
                 'club': club,
@@ -490,6 +544,75 @@ class SearchGoalMatchView(View):
             return render(request, 'app/goal_match_page.html', {'form':form})
 
         return render(request, 'app/goal_match_page.html', {'form': form})
+
+
+
+class MatchDayToReachGoals(View):
+    query = None
+    results = []
+    form_class = SearchGoalMatchForm
+
+    def get(self, request):
+        form = self.form_class(request.GET)
+        if form.is_valid():
+            club = form.cleaned_data.get('club', None)
+            no_of_goals = form.cleaned_data['no_of_goals']
+            goals = form.cleaned_data['goals']
+            ground = form.cleaned_data['ground']
+
+            print(goals)
+
+            query = Q()
+
+            query &= Q(club=club)
+
+            if ground and ground != "null":
+                query &= Q(ground=ground)
+
+            if goals == 'GF':
+                df = pd.DataFrame(
+                    ClubPoint.objects.filter(query).filter(tournament__name='Premier League').all().
+                    values_list('season__name', 'club_against__name','outcome','goals_scored','matchweek','ground').order_by('club_against'),
+                    columns=['Season', 'Opponent','Outcome','Goals Scored','MatchWeek','Ground']
+                )
+
+                df.sort_values(['Season','MatchWeek'], ascending=True, inplace=True)
+
+                df['CumulativeGoals'] = df.groupby('Season')['Goals Scored'].cumsum()
+                df_results = df[df['CumulativeGoals'] >= int(no_of_goals)].groupby('Season').first().reset_index()
+                df_results = df_results[['Season','MatchWeek']].rename(columns={'Matchday': f'MatchdayToReach {no_of_goals} Goals'})
+                
+            else:
+                df = pd.DataFrame(
+                    ClubPoint.objects.filter(query).filter(tournament__name='Premier League').all().
+                    values_list('season__name', 'club_against__name','outcome','goals_against','matchweek','ground').order_by('club_against'),
+                    columns=['Season', 'Opponent','Outcome','Goals Against','MatchWeek','Ground']
+                )
+                df.sort_values(['Season','MatchWeek'], ascending=True, inplace=True)
+
+
+                df['CumulativeGoals'] = df.groupby('Season')['Goals Against'].cumsum()
+                df_results = df[df['CumulativeGoals'] >= int(no_of_goals)].groupby('Season').first().reset_index()
+                df_results = df_results[['Season','MatchWeek']].rename(columns={'MatchWeek': f'MatchdayToConcede {no_of_goals} Goals'})
+
+            print(df_results)
+            
+            context = {
+                'club': club,
+                'goals': goals,
+                'no_of_goals': no_of_goals,
+                'ground': ground,
+                'table': df_results.values.tolist(),
+                #'results': df_results.values.tolist(),
+            }
+
+            return render(request, 'app/match-reach-goal-result-page.html', context)
+            
+        else:
+            return render(request, 'app/match-reach-goal.html', {'form':form})
+
+        return render(request, 'app/match-reach-goal.html', {'form': form})
+
 
 
 class TeamSearchGoalView(View):

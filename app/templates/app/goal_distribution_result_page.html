@@ -13,6 +13,19 @@
 {% block content %}
 
 {% if results %}
+{% if user.is_authenticated %}
+<div class="col-12 mt-5">
+	<form method="post" action="{% url 'dist-goal-search' %}">
+		{% csrf_token %}
+		{{ save_url_form.as_p }}
+		<button type="submit" class="btn btn-outline-primary mt-3">Save this result</</button>
+	</form>
+</div>
+{% else %}
+<div class="col-12 mt-5">
+<h3><a href="{% url 'account_login' %}">Login</a> to save this results</h3>
+</div>
+{% endif %}
 
 <div class="col-3">
 <div class="icon-bar">

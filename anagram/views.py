@@ -45,7 +45,7 @@ def generate_three_five_lettered_words(letters):
 def generate_words(letters, length):
     import nltk
     #nltk.download('words')
-    nltk.download('wordnet')
+    #nltk.download('wordnet')
     from nltk.corpus import words, wordnet
     
     valid_words = set(words.words())
@@ -71,7 +71,7 @@ def home(request):
         form = WordsForm(request.POST)
         if form.is_valid():
             #input_text = form.cleaned_data['letters']
-            no_of_words = form.cleaned_data['no_of_letters']
+            no_of_words = form.cleaned_data['number_of_letters']
             letter_list = form.cleaned_data['letter_list']
 
             print(no_of_words, letter_list)

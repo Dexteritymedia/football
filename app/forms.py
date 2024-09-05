@@ -2,7 +2,7 @@ from django import forms
 from django.contrib.auth import get_user_model
 from django.contrib.auth.forms import UserCreationForm
 
-from .models import Team, Tournament, ClubPoint, Season 
+from .models import Team, Tournament, ClubPoint, Season, SavedUrl
 
 User = get_user_model()
 
@@ -98,37 +98,50 @@ class AllClubForm(forms.Form):
 
 class ClubPointForm(forms.Form):
     
-    season = forms.ModelMultipleChoiceField(queryset=Season.objects.all(), widget=forms.SelectMultiple)
+    season = forms.ModelMultipleChoiceField(queryset=Season.objects.all(), widget=forms.SelectMultiple)#"class":"form-select"
     matchweek = forms.ChoiceField(label="Match Week", help_text='Enter a match week', choices=MATCHWEEK)
 
 
 class MatchForm(forms.Form): 
-    club = forms.ModelChoiceField(queryset=Team.objects.filter(league__name='Premier League'))
+    club = forms.ModelChoiceField(queryset=Team.objects.filter(league__name='Premier League'), widget=forms.Select(attrs={"class":"form-control bg-dark"}))
     matchweek = forms.ChoiceField(label="Match Week", required=False, help_text='Enter a match week', choices=MATCHWEEK, widget=forms.HiddenInput(),)
     outcome = forms.ChoiceField(label="Match Outcome", required=False, initial='D', choices=OUTCOME, widget=forms.HiddenInput())
-    ground = forms.ChoiceField(required=False, label="Match Ground", choices=GROUND)
-    tournament = forms.ModelChoiceField(required=False, queryset=Tournament.objects.all())
-    opponent = forms.ModelChoiceField(required=False, queryset=Team.objects.filter(league__name='Premier League'))
+    ground = forms.ChoiceField(required=False, label="Match Ground", choices=GROUND, widget=forms.Select(attrs={"class":"form-control bg-dark"}))
+    tournament = forms.ModelChoiceField(required=False, queryset=Tournament.objects.all(), widget=forms.Select(attrs={"class":"form-control bg-dark"}))
+    opponent = forms.ModelChoiceField(required=False, queryset=Team.objects.filter(league__name='Premier League'), widget=forms.Select(attrs={"class":"form-control bg-dark"}))
     start_date = forms.DateField(label="Start Date",widget=forms.DateInput(attrs={"class":"form-control", "type":"date", "id":"start_date"}))
     end_date = forms.DateField(label="End Date",widget=forms.DateInput(attrs={"class":"form-control", "type":"date", "id":"end_date"}))
 
 
 class TeamGoalForm(forms.Form): 
-    club = forms.ModelChoiceField(queryset=Team.objects.filter(league__name='Premier League'))
-    no_of_goals = forms.IntegerField(initial=2)
-    goals = forms.ChoiceField(choices=GOALS_TYPE, required=False)
+    club = forms.ModelChoiceField(queryset=Team.objects.filter(league__name='Premier League'), widget=forms.Select(attrs={"class":"form-control bg-dark"}))
+    no_of_goals = forms.IntegerField(label="No. of Goals", initial=2, widget=forms.NumberInput(attrs={"class":"form-control"}))
+    goals = forms.ChoiceField(choices=GOALS_TYPE, required=False, widget=forms.Select(attrs={"class":"form-control bg-dark"}))
     date = forms.DateField(label="Date", required=False, widget=forms.DateInput(attrs={"class":"form-control", "type":"date", "id":"start_date"}))
 
 
 class SearchGoalMatchForm(forms.Form): 
-    club = forms.ModelChoiceField(queryset=Team.objects.filter(league__name='Premier League'))
-    no_of_goals = forms.IntegerField(initial=2)
-    goals = forms.ChoiceField(label="Type", choices=GOALS_TYPE, required=False)
-    ground = forms.ChoiceField(choices=GROUND, required=False)
+    club = forms.ModelChoiceField(queryset=Team.objects.filter(league__name='Premier League'), widget=forms.Select(attrs={"class":"form-control bg-dark"}))
+    no_of_goals = forms.IntegerField(label="No. of Goals", initial=2, widget=forms.NumberInput(attrs={"class":"form-control"}))
+    goals = forms.ChoiceField(label="Type", choices=GOALS_TYPE, required=False, widget=forms.Select(attrs={"class":"form-control bg-dark"}))
+    ground = forms.ChoiceField(choices=GROUND, required=False, widget=forms.Select(attrs={"class":"form-control bg-dark"}))
 
 
 class GoalDistForm(forms.Form): 
-    club = forms.ModelChoiceField(queryset=Team.objects.filter(league__name='Premier League'))
-    ground = forms.ChoiceField(choices=GROUND, required=False)
-    tournament = forms.ModelChoiceField(required=False, queryset=Tournament.objects.all())
+    club = forms.ModelChoiceField(queryset=Team.objects.filter(league__name='Premier League'), widget=forms.Select(attrs={"class":"form-control bg-dark"}))
+    ground = forms.ChoiceField(choices=GROUND, required=False, widget=forms.Select(attrs={"class":"form-control bg-dark"}))
+    tournament = forms.ModelChoiceField(required=False, queryset=Tournament.objects.all(), widget=forms.Select(attrs={"class":"form-control bg-dark"}))
     date = forms.DateField(label="Date", required=False, widget=forms.DateInput(attrs={"class":"form-control", "type":"date", "id":"start_date"}))
+
+
+class SavedUrlForm(forms.ModelForm):
+    class Meta:
+        model = SavedUrl
+        fields = ['name', 'url']
+
+    def __init__(self, *args, **kwargs):
+        url = kwargs.pop('url', None)
+        super().__init__(*args, **kwargs)
+        if url:
+            self.fields['url'] = forms.CharField(widget=forms.HiddenInput(), initial=url)
+            self.fields['url'].initial = url

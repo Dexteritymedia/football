@@ -10,19 +10,29 @@
 {% block add_script %}
 
 {% endblock add_script %}
+{% block ads_script %}
+{% endblock ads_script %}
+{% block ads %}
+{% endblock ads %}
+{% block ads_ %}
+{% endblock ads_ %}
 
 {% block content %}
 <div class="text-center mt-5">
 <h1>Premier League Goal Stats: Match Results by Goal</h1>
 <h4 class="mt-4">Discover detailed Premier League teams match results. Select a team, input the number of goals count and date to see wins, stats, and more. Stay updated with your team performance.</h4></div>
-	<div class="col-12 p-3">
+	<div class="col-12 col-md-6 p-3">
 			<form method="GET" action="">
 				<div class="row">
 				{% for field in form %}
 					{% if field.is_hidden %}
 						{% else %}
 						<div class="col-md-12 col-12 mb-3">
-							<h5 class="display-6">{{ field.label_tag }} {{ field }}</h5>
+							<h5 class="display-6">{{ field.label_tag }} 
+							{% if field.field.required %}
+									<span style="color: red;">*</span>
+								{% endif %}
+								{{ field }}</h5>
 						</div>
 						{% endif %}
 				{% endfor %}

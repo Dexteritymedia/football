@@ -33,6 +33,7 @@ from wagtail.contrib.sitemaps import Sitemap
 from app.sitemaps import TeamSitemap, TeamListSitemap, StaticSitemap
 
 import environ
+from allauth.account.views import LoginView, SignupView
 
 env = environ.Env(
     DEBUG=(bool, False)
@@ -91,6 +92,8 @@ urlpatterns = [
     path(f'{BLOG_ADMIN_URL}/', include(wagtailadmin_urls)),
     path('documents/', include(wagtaildocs_urls)),
     path('blog/', include(wagtail_urls)),
+
+    path("accounts/", include("allauth.urls")),
 ]
 
 if settings.DEBUG:

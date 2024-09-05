@@ -3,9 +3,19 @@ import uuid
 from django.db import models
 from django.utils.safestring import mark_safe
 from django.urls import reverse
+from django.conf import settings
 
 # Create your models here.
 
+
+class SavedUrl(models.Model):
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+    name = models.CharField(max_length=255, blank=True)
+    url = models.URLField()
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return self.name
 
 class Tournament(models.Model):
     name = models.CharField(max_length=100)

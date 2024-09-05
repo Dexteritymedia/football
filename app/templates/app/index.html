@@ -98,6 +98,23 @@ of AI without any limitations.</h4>
     </div>
 	</div>
 	
+	
+	 <div class="col">
+  <div class="shadow bg-body rounded">
+    <div class="card bg-custom-color mb-3">
+	<img class="card-img" src="{% static 'images/header.jpg' %}" alt="A sample image"/>
+      <div class="card-body" style="color: #000;">
+	
+        <h1 class="card-title">Team Match-to-Goal Analysis</h1>
+		<h2 style="font-size: 20px;"></h2>
+		
+        
+		<a href="{% url 'match-reach-goal' %}" type="submit" class="text-center btn btn-warning m-3" >View</a>	
+      </div>
+    </div>
+    </div>
+	</div>
+	
 	<div class="col">
   <div class="shadow bg-body rounded">
     <div class="card bg-custom-color mb-3">
@@ -151,8 +168,11 @@ of AI without any limitations.</h4>
 		
         <h1 class="card-title">Teams Goal Distribution Search</h1>
 		<h2 style="font-size: 20px;"></h2>
-		
-		<a href="{% url 'dist-goal-search' %}" type="submit" class="text-center btn btn-warning m-3" >View</a>	
+		{% if user.is_authenticated %}
+		<a href="{% url 'dist-goal-search' %}" type="submit" class="text-center btn btn-warning m-3" >View</a>
+		{% else %}
+		<h1 class="text-end m-3"><i class="fa fa-user fa-2x"></i></h1>
+		{% endif %}
       </div>
     </div>
     </div>
