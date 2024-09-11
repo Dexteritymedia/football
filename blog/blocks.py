@@ -153,6 +153,34 @@ class ButtonBlock(blocks.StructBlock):
         value_class = LinkStructValue
 
 
+class DragAndDropTableBlock(blocks.StructBlock):
+    items = blocks.ListBlock(
+        blocks.StructBlock(
+            [
+                ('name', blocks.CharBlock(required=True, max_length=40)),
+            ]),
+        label="Table Items",
+        )
+
+    class Meta:
+        template = ""
+
+    def render(self, value, context=None):
+        items = value['items']
+        return mark_safe(f'''
+            <table id="drag-table" class="table">
+                <!-- Add your table structure here -->
+                <!-- Example rows: -->
+                <tr data-id="1"><td>Item 1</td></tr>
+                <tr data-id="2"><td>Item 2</td></tr>
+                <tr data-id="3"><td>Item 3</td></tr>
+            </table>
+            <input type="hidden" name="{name}" id="sorted-ids" value="">
+        ''')
+
+    class Media:
+        js = ('sortable.js', 'admin/js/drag_and_drop_table.js')
+
 
 class CardBlock(blocks.StructBlock):
     title = blocks.CharBlock(required=True, help_text="Add your title")

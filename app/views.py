@@ -30,24 +30,80 @@ User = get_user_model()
 
 # Create your views here.
 
+def sample_pages(request):
+    context = {}
+    template_name = 'sample_pages/payment_page.html'
+    return render(request, template_name, context)
+
 def home(request):
     context = {}
     return render(request, 'app/index.html', context)
 
 
-@login_required(login_url="login")
+@login_required
+def confirm_plan(request):
+    if request.method == "POST":
+        plan = request.POST.get('plan')
+        price = request.POST.get('price')
+        credit_score = request.POST.get('credit_score')
+        print(plan, price, credit_score)
+
+        if plan == "standard-monthly":
+            credit_score = 10
+        elif plan == "premium-monthly":
+            credit_score = 50
+        elif plan == "enterprise-monthly":
+            credit_score = 100
+
+        # Update the user's credit score (you can adjust the user model or use another approach)
+        """
+        request.user.profile.credit_score = credit_score
+        request.user.profile.save()
+        """
+
+        request.user.user_credits += int(credit_score)
+        request.user.save()
+
+        return JsonResponse({
+            "message": f"Plan {plan} selected. Credit score updated to {credit_score}.",
+            'plan': plan,
+            'price': price,
+            'credit_score': credit_score
+        })
+    else:
+        return JsonResponse({"error": "Invalid request."}, status=400)
+
+@login_required(login_url="account_login")
 def user_profile(request, username):
     user = get_object_or_404(User, username=username)
     print(user)
     if user != request.user:
         return HttpResponseForbidden()
     saved_urls = SavedUrl.objects.filter(user=user).order_by('-created_at')
-    return render(request, 'app/user_page.html', {'user':user, 'contents':saved_urls})
+    
+    paginator = Paginator(saved_urls, 2)  # Show 10 items per page
+
+    page_number = request.GET.get('page')
+    page_obj = paginator.get_page(page_number)
+
+    """
+    if request.htmx:  # Check if the request is an HTMX request
+        return render(request, 'partials/user_page.html', {'contents': page_obj})
+    return render(request, 'app/user_page.html', {'user':user, 'contents': page_obj})
+    """
+    return render(request, 'partials/user_page_infinite_scroll.html', {'user':user, 'contents':page_obj})
 
 
 def payment_page(request):
-    context ={}
+    context = {}
+    #return render(request, 'payments/payment_page.html', context)
     return render(request, 'app/payment_page.html', context)
+
+def success(request):
+    return render(request, 'payments/success.html')
+
+def error(request):
+    return render(request, 'payments/error.html')
 
 
 def team_list_page(request):
@@ -340,13 +396,13 @@ class GoalDistView(View):
     def get(self, request):
         form = self.form_class(request.GET)
         save_url = SavedUrlForm(url=request.build_absolute_uri())
-        print(save_url)
         if form.is_valid():
             club = form.cleaned_data.get('club', None)
             ground = form.cleaned_data['ground']
             date = form.cleaned_data['date']
             tournament = form.cleaned_data['tournament']
             print(ground)
+            print(request.build_absolute_uri())
 
             query = Q()
 
@@ -423,18 +479,27 @@ class GoalDistView(View):
         return render(request, 'app/goal_distribution_page.html', {'form': form})
 
     def post(self, request):
-        save_url_form = SavedUrlForm(request.POST)
-        print(save_url_form)
-        if save_url_form.is_valid():
-            saved_url = save_url_form.save(commit=False)
-            print(saved_url)
+        url = request.POST.get('url')
+        name = request.POST.get('name', None)
+
+        if url:
+            saved_url = SavedUrl()
             saved_url.user = request.user
+            saved_url.url = url
+            saved_url.name = name
             saved_url.save()
+        
+            user_account_url = reverse('user_profile', kwargs={'username':saved_url.user.username})
+            print(user_account_url)
             #return redirect('user_profile', saved_url.user.username)
             messages.info(request, mark_safe(
-                'You have successfully saved this!'
+                'You have successfully saved this! <a href="{user_account_url}" target="_blank">Profile</a>'
             ))
             return HttpResponseRedirect(request.get_full_path())
+        else:
+            messages.info(request, mark_safe(
+                f"You can't save this! because"
+            ))
         return self.get(request)
 
 class SearchGoalMatchView(View):

@@ -27,6 +27,14 @@ from modelcluster.tags import ClusterTaggableManager
 from . import blocks
 
 from .blocks import PageSectionStoryBlock, StoryBlock
+from .widgets import DragAndDropTableWidget
+
+class MyDraggableTablePage(Page):
+    sorted_ids = models.TextField(blank=True, null=True)
+
+    content_panels = Page.content_panels + [
+        FieldPanel('sorted_ids', widget=DragAndDropTableWidget),
+    ]
 
 
 class BlogIndexPage(Page):

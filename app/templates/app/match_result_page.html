@@ -1,7 +1,5 @@
 {% extends 'app/base.html' %}
 
-{% load adsterra_tags %}
-
 {% block css %}
 
 .bg-custom-color {
@@ -163,4 +161,12 @@ data-layout="button_count" class="facebook"><i class='fab fa-facebook-f' style="
 							</div>
 						{% endif %}
 	{% endif %}
+	
+{% if request.user.user_credits > 0 %}
+
+{{request.user.user_credits}}
+
+{% endif %}
+<p class="mt-5"></p>
+
 {% endblock content %}

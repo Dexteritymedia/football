@@ -86,6 +86,7 @@ MIDDLEWARE = [
 
     'wagtail.contrib.redirects.middleware.RedirectMiddleware',
     'allauth.account.middleware.AccountMiddleware',
+    'app.middleware.HtmxMiddleware',
 ]
 
 AUTHENTICATION_BACKENDS = [

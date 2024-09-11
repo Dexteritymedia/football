@@ -12,13 +12,18 @@ urlpatterns = [
     path('match-goal-search/', views.SearchGoalMatchView.as_view(), name='match-goal-search'),
     path('match-to-reach-goal-search/', views.MatchDayToReachGoals.as_view(), name='match-reach-goal'),
     path('goal-search/', views.GoalDistView.as_view(), name='dist-goal-search'),
+    path('pricing/', views.payment_page, name='payment-page'),
+    path('success/', views.success, name='success'),
+    path('error/', views.error, name='error'),
+    path('confirm-plan/', views.confirm_plan, name='confirm_plan'),
+
+    path('sp/', views.sample_pages, name='sample_pages'),
 
     path('export/', views.export_csv, name='export-csv'),
     path('update/', views.update_data, name='update-data'),
     path('f/', views.filter_data, name='filter-data'),
     path('delete/', views.delete_certain_data),
     path('result-page/', views.result_page, name='result-page'),
-    path('pricing/', views.payment_page, name='payment-page'),
 
     path('search-form/', views.searchform, name='search-form'),
     path('search/', views.search_page, name='search'),

@@ -137,7 +137,7 @@ class GoalDistForm(forms.Form):
 class SavedUrlForm(forms.ModelForm):
     class Meta:
         model = SavedUrl
-        fields = ['name', 'url']
+        fields = ['name']
 
     def __init__(self, *args, **kwargs):
         url = kwargs.pop('url', None)

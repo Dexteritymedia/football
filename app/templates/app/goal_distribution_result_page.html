@@ -17,7 +17,8 @@
 <div class="col-12 mt-5">
 	<form method="post" action="{% url 'dist-goal-search' %}">
 		{% csrf_token %}
-		{{ save_url_form.as_p }}
+		<input type="hidden" name="url" value="{{ request.build_absolute_uri }}" id="url">
+		<input type="hidden" name="name" value="All {{club}}'s {% if tournament %} {{tournament}} {% endif %} {% if ground %} {{ground}} {% endif %}goals {% if date %}from {{date}}{% endif %} across {{no_of_teams}} Teams" id="name">
 		<button type="submit" class="btn btn-outline-primary mt-3">Save this result</</button>
 	</form>
 </div>

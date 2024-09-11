@@ -1,0 +1,16 @@
+{% load static %}
+<table id="drag-table" class="table">
+    <!-- Add your table structure here -->
+    <thead>
+        <tr>
+            <th>Item</th>
+        </tr>
+    </thead>
+    <tbody>
+		{% for item in value.items %}
+			<tr data-id="{{ forloop.counter0 }}"><td{{ item.name }}</td></tr>
+		{% endfor %}
+    </tbody>
+</table>
+<input type="hidden" name="{{ widget.name }}" id="sorted-ids" value="">
+<script src="{% static 'admin/js/drag_and_drop_table.js' %}"></script>

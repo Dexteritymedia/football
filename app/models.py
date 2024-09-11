@@ -1,4 +1,5 @@
 import uuid
+import datetime
 
 from django.db import models
 from django.utils.safestring import mark_safe
@@ -16,6 +17,48 @@ class SavedUrl(models.Model):
 
     def __str__(self):
         return self.name
+
+class CustomerPayment(models.Model):
+    PLAN = (
+        ('basic', 'Basic'),
+        ('standard', 'Standard'),
+        ('premium', 'Premium'),
+    )
+    SUBSCRIPTION = (
+        ('monthly', 'Monthly'),
+        ('yearly', 'Yearly'),
+    )
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, null=True, on_delete=models.CASCADE)
+    amount = models.PositiveIntegerField(null=True, blank=True)
+    date = models.DateTimeField(blank=True)
+    transaction_id = models.CharField(max_length=50, null=True, blank=True)
+    status = models.BooleanField(default=False)
+    credit = models.PositiveIntegerField(null=True, blank=True)
+    plan = models.CharField(max_length=50, null=True, choices=PLAN)
+    subscription = models.CharField(max_length=50, null=True, choices=SUBSCRIPTION)
+    expiry_date = models.DateTimeField(blank=True)
+
+    def __str__(self):
+        return f"{self.user} Plan: {self.plan}  Subscription: {self.subscription} Date: {self.date} Expiry Date: {self.expiry_date}"
+
+
+    def save(self, *args, **kwargs):
+        print(self.date)
+        date = datetime.datetime.strptime(str(self.date), '%Y-%m-%d %H:%M:%S%z')
+        if self.subscription == 'yearly':
+            self.expiry_date = date + datetime.timedelta(days=365)
+            if self.plan == 'basic':
+                self.credit = 10 * 12
+            elif self.plan == 'standard':
+                self.credit = 100 * 12
+            else:
+                self.credit = 1000 * 12
+        else:
+            self.expiry_date = date + datetime.timedelta(days=31)
+            
+        super(CustomerPayment, self).save(*args, **kwargs)
+            
+    
 
 class Tournament(models.Model):
     name = models.CharField(max_length=100)

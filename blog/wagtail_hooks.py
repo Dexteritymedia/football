@@ -1,7 +1,7 @@
 from wagtail import hooks
 from wagtail_modeladmin.options import ModelAdmin, ModelAdminGroup, modeladmin_register
 
-from .models import BlogIndexPage, BlogDetailPage, BlogListingPage, BlogTagPage
+from .models import BlogIndexPage, BlogDetailPage, BlogListingPage, BlogTagPage, MyDraggableTablePage
 
 #to change the name "Snippets" to Overview in wagtail admin sidebar
 @hooks.register('construct_main_menu')
@@ -80,7 +80,16 @@ class BlogTagPageAdmin(ModelAdmin):
     search_fields = ('title', 'body', 'latest_revision_created_at')
 
 
+class DraggableTablePageAdmin(ModelAdmin):
+    model = MyDraggableTablePage
+    menu_label = 'Draggable table'
+    menu_icon = 'plus-inverse'
+    menu_order = 200
+    add_to_settings_menu = False
+    exclude_from_explorer = False
+
 modeladmin_register(HomePageAdmin)
 modeladmin_register(BlogListingPageAdmin)
 modeladmin_register(BlogDetailPageAdmin)
 modeladmin_register(BlogTagPageAdmin)
+modeladmin_register(DraggableTablePageAdmin)

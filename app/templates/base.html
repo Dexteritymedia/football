@@ -119,6 +119,12 @@
 					</div>
 				{% endfor %}
 			{% endif %}
+			
+			{% if request.user.user_credits == 0 %}
+				<div class="mt-5 alert alert-warning">
+						<strong>You are now using the free version <a href="{% url 'payment-page' %}">Payment</a></strong>
+				</div>
+			{% endif %}
 
 			{% block content %}
 			{% endblock content %}

@@ -1,6 +1,18 @@
 {% extends 'app/base.html' %}
 
+{% if user.is_authenticated and user.user_credits > 0%}
+
+{% block add_script %}
+{% endblock add_script %}
+{% block ads_script %}
+{% endblock ads_script %}
+{% block ads %}
+{% endblock ads %}
+{% block ads_ %}
+{% endblock ads_ %}
 {% load adsterra_tags %}
+
+{% endif %}
 
 {% block facebook_meta %}
 	<meta property="og:title"         content=""/>
